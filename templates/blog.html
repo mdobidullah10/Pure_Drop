@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}ব্লগ ও রান্নার রেসিপি — Pure Drop{% endblock %}
+{% block title %}{{ t('blog_recipes', 'ব্লগ ও রান্নার রেসিপি') }} — Pure Drop{% endblock %}
 
 {% block content %}
-<div class="container" style="padding: 40px 0 60px;">
+<div class="container" style="padding: 40px 0 70px;">
   
-  <div style="margin-bottom: 36px; text-align: center;">
-    <p class="section-tag">খাদ্য ও জীবনধারা</p>
-    <h1 style="font-size: 2.4rem; font-weight: 800; color: var(--pd-forest); margin-bottom: 8px;">
-      Pure Drop ব্লগ ও রান্নার রেসিপি
+  <div style="margin-bottom: 40px; text-align: center;">
+    <p class="section-tag">{{ t('health_recipes_tag', 'পুষ্টি ও রেসিপি') }}</p>
+    <h1 style="font-size: 2.5rem; font-weight: 800; color: var(--pd-forest); margin-bottom: 10px;">
+      {{ t('health_recipes_title', 'স্বাস্থ্য সচেতন টিপস ও রান্নার রেসিপি') }}
     </h1>
-    <p style="color: var(--pd-text-muted); max-width: 600px; margin: 0 auto;">
-      খাঁটি খাবারের পুষ্টিগুণ, ভেজাল শনাক্তকরণের উপায় এবং ঐতিহ্যবাহী রান্নার স্বাদ বৃদ্ধির সহজ টিপস।
+    <p style="color: var(--pd-text-muted); max-width: 650px; margin: 0 auto; font-size: 1.05rem; line-height: 1.6;">
+      প্রতিদিনের স্বাস্থ্যকর জীবনধারা, কম তেলে পুষ্টিকর রান্না এবং Pure Drop-এর খাঁটি খাদ্যপণ্যের প্রাকৃতিক পুষ্টিগুণের নির্ভরযোগ্য নির্দেশিকা।
     </p>
   </div>
 
@@ -19,17 +19,36 @@
     {% for post in posts %}
     <article class="blog-card">
       <a href="{{ url_for('blog_detail', slug=post.slug) }}" class="blog-card-img">
-        <img src="{{ post.cover_image or '/static/images/poster_natural.png' }}" alt="{{ post.title }}" loading="lazy">
+        <img src="{{ post.cover_image or '/static/images/blog_health_tips.jpg' }}" alt="{{ post.title }}" loading="lazy">
+        
+        <!-- Category Badge -->
+        {% if 'টিপস' in post.category or 'Tips' in post.category %}
+          <span class="blog-card-badge badge-cat-tips">🌿 {{ post.category }}</span>
+        {% elif 'রেসিপি' in post.category or 'Recipe' in post.category %}
+          <span class="blog-card-badge badge-cat-recipes">🍲 {{ post.category }}</span>
+        {% else %}
+          <span class="blog-card-badge badge-cat-products">🍯 {{ post.category }}</span>
+        {% endif %}
+
+        <!-- Reading Time -->
+        <span class="blog-read-time">
+          ⏱️ {% if loop.index == 1 %}৪{% elif loop.index == 2 %}৫{% else %}৩{% endif %} {{ t('reading_time', 'মিনিট পাঠ') }}
+        </span>
       </a>
+
       <div class="blog-card-body">
-        <span class="blog-category">{{ post.category }}</span>
+        <div class="blog-category-subtitle">{{ post.category }}</div>
         <h3 class="blog-title">
           <a href="{{ url_for('blog_detail', slug=post.slug) }}">{{ post.title }}</a>
         </h3>
-        <p class="blog-excerpt">{{ post.excerpt|truncate(120) }}</p>
-        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--pd-border); padding-top: 12px; margin-top: 12px; font-size: 0.8rem; color: var(--pd-text-light);">
-          <span>✍️ {{ post.author_name }}</span>
-          <a href="{{ url_for('blog_detail', slug=post.slug) }}" style="color: var(--pd-forest); font-weight: 700;">পড়ুন ➔</a>
+        <p class="blog-excerpt">{{ post.excerpt }}</p>
+        
+        <div class="blog-card-footer">
+          <span class="blog-author-tag">✍️ {{ post.author_name }}</span>
+          <a href="{{ url_for('blog_detail', slug=post.slug) }}" class="blog-detail-btn">
+            <span>{{ t('read_more', 'বিস্তারিত পড়ুন')|replace(' ➔', '')|replace(' →', '') }}</span>
+            <span class="arrow">→</span>
+          </a>
         </div>
       </div>
     </article>

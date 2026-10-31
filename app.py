@@ -19,6 +19,7 @@ from auth_helpers import (
     is_setup_required, get_current_user, user_has_permission,
     login_required, admin_required, super_admin_required, permission_required
 )
+import translations
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # On Vercel / serverless, filesystem is read-only except /tmp
@@ -106,14 +107,33 @@ def inject_global_data():
 
     conn.close()
 
+    # Language support
+    current_lang = session.get("lang", "bn")
+    if current_lang not in ["bn", "en"]:
+        current_lang = "bn"
+
+    def t(key, fallback=""):
+        return translations.get_text(key, current_lang, fallback)
+
     return {
         "cart_count": cart_count,
         "settings": settings,
         "nav_categories": nav_categories,
         "current_admin": current_admin,
         "current_user": current_user,
-        "user": current_user
+        "user": current_user,
+        "current_lang": current_lang,
+        "t": t
     }
+
+@app.route("/set-language/<lang>")
+def set_language(lang):
+    if lang in ["bn", "en"]:
+        session["lang"] = lang
+    next_url = request.referrer or url_for("home")
+    if "/set-language" in next_url:
+        next_url = url_for("home")
+    return redirect(next_url)
 
 # Helper to calculate cart totals
 def calculate_cart_totals(cart, coupon_code=""):
@@ -188,7 +208,7 @@ def home():
     ).fetchall()
     if not featured_products:
         featured_products = conn.execute("SELECT * FROM products WHERE is_active=1 ORDER BY id DESC LIMIT 8").fetchall()
-    blog_posts = conn.execute("SELECT * FROM blog_posts WHERE is_published=1 ORDER BY id DESC LIMIT 3").fetchall()
+    blog_posts = conn.execute("SELECT * FROM blog_posts WHERE is_published=1 ORDER BY id ASC LIMIT 3").fetchall()
     conn.close()
 
     return render_template(
@@ -537,7 +557,7 @@ def wishlist():
 @app.route("/blog")
 def blog():
     conn = get_db()
-    posts = conn.execute("SELECT * FROM blog_posts WHERE is_published=1 ORDER BY id DESC").fetchall()
+    posts = conn.execute("SELECT * FROM blog_posts WHERE is_published=1 ORDER BY id ASC").fetchall()
     conn.close()
     return render_template("blog.html", posts=posts)
 
@@ -545,10 +565,17 @@ def blog():
 def blog_detail(slug):
     conn = get_db()
     post = conn.execute("SELECT * FROM blog_posts WHERE slug=? AND is_published=1", (slug,)).fetchone()
-    conn.close()
     if not post:
+        conn.close()
         abort(404)
-    return render_template("blog_detail.html", post=post)
+    related_posts = conn.execute(
+        "SELECT * FROM blog_posts WHERE is_published=1 AND id != ? ORDER BY id ASC LIMIT 2", (post["id"],)
+    ).fetchall()
+    related_products = conn.execute(
+        "SELECT * FROM products WHERE is_active=1 ORDER BY is_featured DESC, id ASC LIMIT 3"
+    ).fetchall()
+    conn.close()
+    return render_template("blog_detail.html", post=post, related_posts=related_posts, related_products=related_products)
 
 @app.route("/about")
 def about():
@@ -1582,6 +1609,11 @@ def admin_blog_form_handler(post_id=None):
         category = request.form.get("category", "স্বাস্থ্য ও পুষ্টি").strip()
         author_name = request.form.get("author_name", "Pure Drop টিম").strip()
         cover_image = request.form.get("cover_image", "").strip()
+        cover_file = request.files.get("cover_image_file")
+        if cover_file and cover_file.filename and allowed_file(cover_file.filename):
+            filename = f"blog_{int(datetime.now().timestamp())}_{secure_filename(cover_file.filename)}"
+            cover_file.save(os.path.join(UPLOAD_FOLDER, filename))
+            cover_image = f"/static/uploads/{filename}"
         excerpt = request.form.get("excerpt", "").strip()
         content = request.form.get("content", "").strip()
         is_published = 1 if request.form.get("is_published") else 0

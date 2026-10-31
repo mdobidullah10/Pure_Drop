@@ -31,9 +31,13 @@
         {% endif %}
       </div>
       <div class="announcement-links">
-        <a href="{{ url_for('track') }}">🚚 অর্ডার ট্র্যাকিং</a>
+        <a href="{{ url_for('track') }}">🚚 {{ t('order_tracking', 'অর্ডার ট্র্যাকিং') }}</a>
         <span>|</span>
         <a href="https://wa.me/88{{ settings.contact_whatsapp|replace('-', '')|replace(' ', '') }}" target="_blank" rel="noopener">WhatsApp: {{ settings.contact_whatsapp }}</a>
+        <span>|</span>
+        <a href="{{ url_for('set_language', lang='en' if current_lang == 'bn' else 'bn') }}" class="announcement-lang-toggle" title="Switch Language / ভাষা পরিবর্তন">
+          🌐 <b>{{ 'English' if current_lang == 'bn' else 'বাংলা' }}</b>
+        </a>
       </div>
     </div>
   </aside>
@@ -55,7 +59,7 @@
       <!-- Live Search Bar -->
       <div class="header-search">
         <form class="search-input-wrap" action="{{ url_for('products') }}" method="GET">
-          <input type="text" name="q" value="{{ request.args.get('q', '') }}" placeholder="ঘি, মধু, সরিষার তেল খুঁজুন..." autocomplete="off">
+          <input type="text" name="q" value="{{ request.args.get('q', '') }}" placeholder="{{ t('search_placeholder', 'ঘি, মধু, সরিষার তেল খুঁজুন...') }}" autocomplete="off">
           <button type="submit" aria-label="অনুসন্ধান">🔍</button>
         </form>
       </div>
@@ -63,37 +67,43 @@
       <!-- Action Buttons -->
       <div class="header-actions">
         <!-- Direct Phone/WhatsApp -->
-        <a class="whatsapp-link" href="https://wa.me/88{{ settings.contact_whatsapp|replace('-', '')|replace(' ', '') }}" target="_blank" rel="noopener" title="হোয়াটসঅ্যাপে যোগাযোগ">
+        <a class="whatsapp-link" href="https://wa.me/88{{ settings.contact_whatsapp|replace('-', '')|replace(' ', '') }}" target="_blank" rel="noopener" title="WhatsApp">
           <span>💬</span>
           <span style="font-size: 0.82rem;">{{ settings.contact_phone }}</span>
         </a>
 
+        <!-- Language Switcher Pill -->
+        <a class="action-pill lang-pill-btn" href="{{ url_for('set_language', lang='en' if current_lang == 'bn' else 'bn') }}" title="Switch Language / ভাষা পরিবর্তন">
+          <span>🌐</span>
+          <span>{{ 'EN' if current_lang == 'bn' else 'বাংলা' }}</span>
+        </a>
+
         <!-- Wishlist -->
-        <a class="action-pill" href="{{ url_for('wishlist') }}" title="পছন্দের তালিকা">
+        <a class="action-pill" href="{{ url_for('wishlist') }}" title="{{ t('wishlist', 'পছন্দের তালিকা') }}">
           <span>❤️</span>
           <span class="badge wishlist-count-badge">0</span>
         </a>
 
         <!-- Cart Trigger Button -->
-        <button class="action-pill cart-open-btn" style="border: none;" title="শピング কার্ট">
-          <span>🛒 কার্ট</span>
+        <button class="action-pill cart-open-btn" style="border: none;" title="{{ t('cart', 'কার্ট') }}">
+          <span>🛒 {{ t('cart', 'কার্ট') }}</span>
           <span class="badge cart-count-badge">{{ cart_count }}</span>
         </button>
 
         <!-- Customer Login / Account -->
         {% if session.get('customer_id') %}
           <a class="action-pill" href="{{ url_for('customer_account') }}">
-            <span>👤 প্রোফাইল</span>
+            <span>👤 {{ t('profile', 'প্রোফাইল') }}</span>
           </a>
         {% else %}
           <a class="action-pill" href="{{ url_for('customer_login') }}">
-            <span>👤 লগইন</span>
+            <span>👤 {{ t('login', 'লগইন') }}</span>
           </a>
         {% endif %}
 
         <!-- Super Admin Panel Shortcut -->
         <a class="action-pill" href="{{ url_for('admin_login') }}" style="background: var(--pd-forest); color: #fff; border-color: var(--pd-forest);" title="সুপার অ্যাডমিন প্যানেল">
-          <span>⚙️ অ্যাডমিন</span>
+          <span>⚙️ {{ t('admin', 'অ্যাডমিন') }}</span>
         </a>
       </div>
     </div>
@@ -102,14 +112,14 @@
     <nav class="site-nav">
       <div class="container">
         <ul class="nav-links">
-          <li><a href="{{ url_for('home') }}" class="{% if request.path == '/' %}active{% endif %}">হোম</a></li>
-          <li><a href="{{ url_for('products') }}" class="{% if request.path == '/products' and not request.args.get('category') %}active{% endif %}">সকল পণ্য</a></li>
+          <li><a href="{{ url_for('home') }}" class="{% if request.path == '/' %}active{% endif %}">{{ t('home', 'হোম') }}</a></li>
+          <li><a href="{{ url_for('products') }}" class="{% if request.path == '/products' and not request.args.get('category') %}active{% endif %}">{{ t('all_products', 'সকল পণ্য') }}</a></li>
           {% for cat in nav_categories %}
-            <li><a href="{{ url_for('products', category=cat.slug) }}" class="{% if request.args.get('category') == cat.slug %}active{% endif %}">{{ cat.name_bn }}</a></li>
+            <li><a href="{{ url_for('products', category=cat.slug) }}" class="{% if request.args.get('category') == cat.slug %}active{% endif %}">{{ cat.name_en if current_lang == 'en' and cat.name_en else cat.name_bn }}</a></li>
           {% endfor %}
-          <li><a href="{{ url_for('blog') }}" class="{% if '/blog' in request.path %}active{% endif %}">ব্লগ ও রেসিপি</a></li>
-          <li><a href="{{ url_for('about') }}" class="{% if request.path == '/about' %}active{% endif %}">আমাদের সম্পর্কে</a></li>
-          <li><a href="{{ url_for('contact') }}" class="{% if request.path == '/contact' %}active{% endif %}">যোগাযোগ</a></li>
+          <li><a href="{{ url_for('blog') }}" class="{% if '/blog' in request.path %}active{% endif %}">{{ t('blog_recipes', 'ব্লগ ও রেসিপি') }}</a></li>
+          <li><a href="{{ url_for('about') }}" class="{% if request.path == '/about' %}active{% endif %}">{{ t('about_us', 'আমাদের সম্পর্কে') }}</a></li>
+          <li><a href="{{ url_for('contact') }}" class="{% if request.path == '/contact' %}active{% endif %}">{{ t('contact', 'যোগাযোগ') }}</a></li>
         </ul>
       </div>
     </nav>

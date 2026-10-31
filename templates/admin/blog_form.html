@@ -11,7 +11,7 @@
       <h3 class="card-title">প্রবন্ধের বিষয়বস্তু</h3>
     </div>
     <div class="card-body">
-      <form action="{% if post %}{{ url_for('admin_blog_edit', post_id=post.id) }}{% else %}{{ url_for('admin_blog_new') }}{% endif %}" method="POST">
+      <form action="{% if post %}{{ url_for('admin_blog_edit', post_id=post.id) }}{% else %}{{ url_for('admin_blog_new') }}{% endif %}" method="POST" enctype="multipart/form-data">
         
         <div class="admin-form-group">
           <label>প্রবন্ধের শিরোনাম *</label>
@@ -35,8 +35,10 @@
             <input type="text" name="author_name" class="admin-input" value="{{ post.author_name if post else 'Pure Drop টিম' }}">
           </div>
           <div class="admin-form-group">
-            <label>কভার ছবির লিংক</label>
-            <input type="text" name="cover_image" class="admin-input" value="{{ post.cover_image if post else '' }}" placeholder="/static/images/...">
+            <label>কভার ছবির লিংক অথবা ফাইল আপলোড</label>
+            <input type="text" name="cover_image" class="admin-input" value="{{ post.cover_image if post else '' }}" placeholder="/static/images/..." style="margin-bottom: 6px;">
+            <input type="file" name="cover_image_file" class="admin-input" accept="image/*">
+            <small style="color: var(--admin-text-muted);">সরাসরি ছবি আপলোড করতে পারেন অথবা বিদ্যমান ছবির লিংক দিতে পারেন।</small>
           </div>
         </div>
 
