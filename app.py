@@ -8,7 +8,7 @@ from functools import wraps
 
 from flask import (
     Flask, render_template, request, redirect, url_for,
-    session, flash, abort, jsonify, Response
+    session, flash, abort, jsonify, Response, send_from_directory
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -31,10 +31,16 @@ else:
 
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif"}
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static")
 app.secret_key = os.environ.get("SECRET_KEY", "pure-drop-production-secret-key-bangladesh-2026")
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16 MB max
+
+# Explicit route to guarantee static assets (CSS, JS, images) are served on Vercel
+@app.route("/static/<path:filename>")
+def serve_static(filename):
+    static_dir = os.path.join(BASE_DIR, "static")
+    return send_from_directory(static_dir, filename)
 
 # Initialize database tables
 try:
