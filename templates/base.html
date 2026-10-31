@@ -75,7 +75,7 @@
         </a>
 
         <!-- Cart Trigger Button -->
-        <button class="action-pill cart-open-btn" style="border: none;" title="শপিং কার্ট">
+        <button class="action-pill cart-open-btn" style="border: none;" title="শピング কার্ট">
           <span>🛒 কার্ট</span>
           <span class="badge cart-count-badge">{{ cart_count }}</span>
         </button>
@@ -90,6 +90,11 @@
             <span>👤 লগইন</span>
           </a>
         {% endif %}
+
+        <!-- Super Admin Panel Shortcut -->
+        <a class="action-pill" href="{{ url_for('admin_login') }}" style="background: var(--pd-forest); color: #fff; border-color: var(--pd-forest);" title="সুপার অ্যাডমিন প্যানেল">
+          <span>⚙️ অ্যাডমিন</span>
+        </a>
       </div>
     </div>
 
