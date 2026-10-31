@@ -65,7 +65,7 @@
             {{ o.district }}
             <small style="display: block; color: var(--admin-text-muted);">{{ o.thana_area }}</small>
           </td>
-          <td>{{ o.created_at[:10] }}</td>
+          <td>{{ o.created_at|date_short }}</td>
           <td>{{ o.payment_method }}</td>
           <td>
             <span class="badge-status badge-{{ o.payment_status|lower }}">{{ o.payment_status }}</span>

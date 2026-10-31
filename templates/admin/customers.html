@@ -48,7 +48,7 @@
           <td>
             <span class="badge-status badge-paid">{{ c.role }}</span>
           </td>
-          <td>{{ c.created_at[:10] }}</td>
+          <td>{{ c.created_at|date_short }}</td>
         </tr>
         {% else %}
         <tr>

@@ -42,7 +42,7 @@
               {{ r.status }}
             </span>
           </td>
-          <td>{{ r.created_at[:10] }}</td>
+          <td>{{ r.created_at|date_short }}</td>
           <td style="text-align: right; white-space: nowrap;">
             {% if r.status != 'approved' %}
             <form action="{{ url_for('admin_review_status', review_id=r.id, status='approved') }}" method="POST" style="display: inline-block;">

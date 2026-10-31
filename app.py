@@ -61,6 +61,22 @@ def money_filter(value):
     except (ValueError, TypeError):
         return f"৳{value}"
 
+@app.template_filter("date_short")
+def date_short_filter(val):
+    if not val:
+        return ""
+    if hasattr(val, "strftime"):
+        return val.strftime("%Y-%m-%d")
+    return str(val)[:10]
+
+@app.template_filter("datetime_short")
+def datetime_short_filter(val):
+    if not val:
+        return ""
+    if hasattr(val, "strftime"):
+        return val.strftime("%Y-%m-%d %H:%M")
+    return str(val)[:16]
+
 @app.context_processor
 def inject_global_data():
     conn = get_db()

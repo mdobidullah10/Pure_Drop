@@ -46,7 +46,7 @@
                 {{ o.order_number }}
               </td>
               <td style="padding: 14px 18px; color: var(--pd-text-muted);">
-                {{ o.created_at[:10] }}
+                {{ o.created_at|date_short }}
               </td>
               <td style="padding: 14px 18px; font-weight: 700; font-family: 'DM Sans', sans-serif;">
                 ৳{{ o.total|int }}

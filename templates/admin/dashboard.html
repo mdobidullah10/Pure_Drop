@@ -99,7 +99,7 @@
             <strong>{{ o.customer_name }}</strong>
             <small style="display: block; color: var(--admin-text-muted);">{{ o.phone }}</small>
           </td>
-          <td>{{ o.created_at[:10] }}</td>
+          <td>{{ o.created_at|date_short }}</td>
           <td>
             <strong style="font-family: 'DM Sans', sans-serif; color: var(--admin-primary);">
               ৳{{ o.total|int }}

@@ -37,7 +37,7 @@
             <small style="display: block; color: var(--admin-text-muted);">{{ post.category }} | slug: {{ post.slug }}</small>
           </td>
           <td>{{ post.author_name }}</td>
-          <td>{{ post.created_at[:10] }}</td>
+          <td>{{ post.created_at|date_short }}</td>
           <td>
             {% if post.is_published == 1 %}
               <span class="badge-status badge-paid">প্রকাশিত</span>

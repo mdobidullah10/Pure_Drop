@@ -53,7 +53,7 @@
               <span class="badge-status badge-unpaid">স্থগিত</span>
             {% endif %}
           </td>
-          <td>{{ s.last_login[:16] if s.last_login else 'N/A' }}</td>
+          <td>{{ s.last_login|datetime_short if s.last_login else 'N/A' }}</td>
           <td style="text-align: right; white-space: nowrap;">
             <a href="{{ url_for('admin_staff_edit', user_id=s.id) }}" class="btn-admin btn-admin-sm btn-admin-primary">এডিট</a>
             {% if s.role != 'super_admin' %}

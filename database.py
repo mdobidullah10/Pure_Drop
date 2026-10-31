@@ -57,6 +57,16 @@ class PGCursorWrapper:
         if converted_sql.strip().upper() == 'BEGIN IMMEDIATE':
             return self
 
+        # Handle SQLite's INSERT OR IGNORE
+        if re.search(r'INSERT\s+OR\s+IGNORE\s+INTO', converted_sql, re.IGNORECASE):
+            converted_sql = re.sub(r'INSERT\s+OR\s+IGNORE\s+INTO', 'INSERT INTO', converted_sql, flags=re.IGNORECASE)
+            converted_sql = converted_sql.rstrip().rstrip(';') + ' ON CONFLICT DO NOTHING'
+
+        # Handle SQLite's INSERT OR REPLACE INTO site_settings
+        if re.search(r'INSERT\s+OR\s+REPLACE\s+INTO\s+site_settings', converted_sql, re.IGNORECASE):
+            converted_sql = re.sub(r'INSERT\s+OR\s+REPLACE\s+INTO\s+site_settings', 'INSERT INTO site_settings', converted_sql, flags=re.IGNORECASE)
+            converted_sql = converted_sql.rstrip().rstrip(';') + ' ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, group_name = EXCLUDED.group_name'
+
         # Handle INSERT ... to populate lastrowid if not present
         is_insert = converted_sql.strip().upper().startswith('INSERT')
         has_returning = 'RETURNING' in converted_sql.upper()

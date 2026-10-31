@@ -84,7 +84,9 @@ def admin_required(fn):
         if not user_id:
             return redirect(url_for("admin_login", next=request.path))
         
-        user = get_db().execute("SELECT * FROM users WHERE id=? AND is_active=1", (user_id,)).fetchone()
+        conn = get_db()
+        user = conn.execute("SELECT * FROM users WHERE id=? AND is_active=1", (user_id,)).fetchone()
+        conn.close()
         if not user or user["role"] == "customer":
             session.pop("admin_user_id", None)
             flash("আপনার প্রশাসনিক একাউন্টে প্রবেশাধিকার নেই।", "error")
