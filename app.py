@@ -21,7 +21,14 @@ from auth_helpers import (
 )
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
+# On Vercel / serverless, filesystem is read-only except /tmp
+IS_VERCEL = bool(os.environ.get("VERCEL"))
+if IS_VERCEL:
+    UPLOAD_FOLDER = "/tmp"
+else:
+    UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif"}
 
 app = Flask(__name__)
@@ -29,10 +36,11 @@ app.secret_key = os.environ.get("SECRET_KEY", "pure-drop-production-secret-key-b
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16 MB max
 
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-# Initialize database tables and seed records
-database.init_db()
+# Initialize database tables
+try:
+    database.init_db()
+except Exception as e:
+    app.logger.warning(f"Database init skipped or already initialized: {e}")
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
