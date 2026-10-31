@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}আমাদের সম্পর্কে (About Pure Drop) — Pure Drop{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 0 80px; max-width: 900px;">
+  
+  <div style="text-align: center; margin-bottom: 40px;">
+    <p class="section-tag">প্রকৃতির কাছাকাছি সততার সাথে</p>
+    <h1 style="font-size: 2.5rem; font-weight: 800; color: var(--pd-forest); margin-bottom: 12px;">
+      Pure Drop এর পথচলা ও আমাদের অঙ্গীকার
+    </h1>
+    <p style="color: var(--pd-text-muted); font-size: 1.1rem; max-width: 680px; margin: 0 auto; line-height: 1.7;">
+      “প্রকৃতির বিশুদ্ধতা, পরিবারের সুস্থতা” — এই মূলমন্ত্রকে হৃদয়ে ধারণ করে আমাদের প্রতিটি পদক্ষেপ।
+    </p>
+  </div>
+
+  <div style="border-radius: var(--pd-radius-lg); overflow: hidden; margin-bottom: 40px; box-shadow: var(--pd-shadow-lg);">
+    <img src="/static/images/poster_natural.png" alt="Pure Drop এর গল্প" style="width: 100%; height: 420px; object-fit: cover;">
+  </div>
+
+  <div style="font-size: 1.1rem; line-height: 1.85; color: var(--pd-text-main); margin-bottom: 40px;">
+    <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--pd-forest); margin-bottom: 12px;">আমাদের মূল লক্ষ্য:</h3>
+    <p style="margin-bottom: 24px;">
+      বর্তমান ব্যস্ত জীবনে ভেজালমুক্ত, নিরাপদ এবং খাঁটি খাদ্য সংগ্রহ করা প্রতিটি পরিবারের জন্য একটি কঠিন চ্যালেঞ্জ। Pure Drop শুরু হয়েছিল এই সাধারণ চিন্তা থেকেই — কীভাবে প্রান্তিক কৃষক, ঐতিহ্যবাহী ঘানি মালিক এবং সুন্দরবনের বিশ্বস্ত মৌয়ালদের সরাসরি শহরের সচেতন পরিবারের সাথে যুক্ত করা যায়।
+    </p>
+
+    <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--pd-forest); margin-bottom: 12px;">আমরা যা বিশ্বাস করি:</h3>
+    <ul style="padding-left: 20px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 10px;">
+      <li><b>কোনো ভেজাল বা কৃত্রিম কেমিক্যাল নয়:</b> আমাদের ঘি, মধু ও সরিষার তেলে কোনো প্রকার প্রিজারভেটিভ, আর্টিফিশিয়াল কালার কিংবা কেমিক্যাল ব্যবহার করা হয় না।</li>
+      <li><b>ঐতিহ্যবাহী পদ্ধতির পুনরুজ্জীবন:</b> আধুনিক কারখানার অতিরিক্ত উত্তাপ ও কেমিক্যাল রিফাইনিং পদ্ধতির বদলে আমরা সনাতন বিলোনা মন্থন ও কাঠের ঘানির কোল্ড-প্রেস পদ্ধতি অনুসরণ করি।</li>
+      <li><b>সরাসরি ও ন্যায্যমূল্যে সংগ্রহ:</b> মধ্যস্বত্বভোগীদের এড়িয়ে সরাসরি উৎপাদক থেকে সংগ্রহ করে আমরা কৃষকদের ন্যায্য পারিশ্রমিক ও ক্রেতাদের সঠিক দাম নিশ্চিত করি।</li>
+    </ul>
+
+    <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--pd-forest); margin-bottom: 12px;">পরিবারের স্বাস্থ্যে আমাদের প্রতিশ্রুতি:</h3>
+    <p>
+      আমরা বিশ্বাস করি খাঁটি খাবার কোনো বিলাসিতা নয়, এটি আপনার পরিবারের প্রতিটি সদস্যের অধিকার। প্রতিদিনের রান্নায় খাঁটি সরিষার তেলের ঝাঁঝ, গরম ভাতে সোনালী গাওয়া ঘি-এর সুবাস আর সকালে খাঁটি মধুর এক চামচ পুষ্টি আপনার জীবনযাত্রাকে করে তুলবে সতেজ ও প্রাণবন্ত।
+    </p>
+  </div>
+
+  <div style="background: var(--pd-ivory); border: 1px solid var(--pd-border); border-radius: var(--pd-radius-md); padding: 32px; text-align: center;">
+    <h4 style="font-size: 1.3rem; font-weight: 800; color: var(--pd-forest); margin-bottom: 8px;">আপনার পছন্দের খাঁটি খাবার আজই বেছে নিন</h4>
+    <p style="color: var(--pd-text-muted); margin-bottom: 20px;">সারা বাংলাদেশে দ্রুত ও নিরাপদ ক্যাশ অন ডেলিভারি সুবিধা উপভোগ করুন।</p>
+    <a href="{{ url_for('products') }}" class="btn btn-primary btn-lg">পণ্যসম্ভার দেখুন ➔</a>
+  </div>
+
+</div>
+{% endblock %}

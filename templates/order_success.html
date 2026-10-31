@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}অর্ডার সফল হয়েছে — Pure Drop{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 0 80px; max-width: 780px;">
+  
+  <div style="background: #fff; border: 1px solid var(--pd-border); border-radius: var(--pd-radius-lg); padding: 40px; box-shadow: var(--pd-shadow-md); text-align: center;">
+    
+    <!-- Success Icon -->
+    <div style="width: 76px; height: 76px; border-radius: 50%; background: #eaf3ed; color: #165339; display: grid; place-items: center; font-size: 2.4rem; margin: 0 auto 20px;">
+      ✓
+    </div>
+
+    <h1 style="font-size: 2rem; font-weight: 800; color: var(--pd-forest); margin-bottom: 8px;">
+      ধন্যবাদ! আপনার অর্ডারটি সফলভাবে সম্পন্ন হয়েছে
+    </h1>
+    <p style="font-size: 1rem; color: var(--pd-text-muted); max-width: 540px; margin: 0 auto 24px; line-height: 1.6;">
+      আমাদের টিম দ্রুত আপনার অর্ডারটি প্রসেস করবে। বিস্তারিত তথ্যের জন্য আমাদের কাস্টমার কেয়ার প্রতিনিধি আপনার সাথে যোগাযোগ করবেন।
+    </p>
+
+    <!-- Order Badge -->
+    <div style="background: var(--pd-ivory); border: 1.5px dashed var(--pd-gold); border-radius: var(--pd-radius-md); padding: 18px 24px; display: inline-block; margin-bottom: 32px;">
+      <span style="font-size: 0.85rem; color: var(--pd-text-muted); display: block; margin-bottom: 4px;">আপনার অর্ডার ট্র্যাকিং নম্বর:</span>
+      <strong style="font-size: 1.6rem; color: var(--pd-forest); letter-spacing: 1px; font-family: 'DM Sans', sans-serif;">
+        {{ order.order_number }}
+      </strong>
+    </div>
+
+    <!-- Order Receipt Summary -->
+    <div style="text-align: left; border: 1px solid var(--pd-border); border-radius: var(--pd-radius-md); padding: 24px; margin-bottom: 32px;">
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--pd-forest); margin-bottom: 16px; border-bottom: 1px solid var(--pd-border); padding-bottom: 8px;">
+        অর্ডারের সংক্ষিপ্ত বিবরণ
+      </h3>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; font-size: 0.92rem;">
+        <div>
+          <span style="color: var(--pd-text-muted);">গ্রাহকের নাম:</span>
+          <strong>{{ order.customer_name }}</strong>
+        </div>
+        <div>
+          <span style="color: var(--pd-text-muted);">ফোন নম্বর:</span>
+          <strong>{{ order.phone }}</strong>
+        </div>
+        <div>
+          <span style="color: var(--pd-text-muted);">ডেলিভারি ঠিকানা:</span>
+          <strong>{{ order.full_address }}, {{ order.thana_area }}, {{ order.district }}</strong>
+        </div>
+        <div>
+          <span style="color: var(--pd-text-muted);">পেমেন্ট পদ্ধতি:</span>
+          <strong>{{ order.payment_method }} ({{ order.payment_status }})</strong>
+        </div>
+      </div>
+
+      <!-- Items Table -->
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.92rem; margin-bottom: 16px;">
+        <thead>
+          <tr style="background: var(--pd-ivory); border-bottom: 1px solid var(--pd-border);">
+            <th style="padding: 10px; text-align: left;">পণ্য</th>
+            <th style="padding: 10px; text-align: center;">পরিমাণ</th>
+            <th style="padding: 10px; text-align: right;">মোট মূল্য</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+          <tr style="border-bottom: 1px solid var(--pd-border);">
+            <td style="padding: 10px;">{{ item.product_name }}</td>
+            <td style="padding: 10px; text-align: center;">{{ item.quantity }}</td>
+            <td style="padding: 10px; text-align: right; font-weight: 600;">৳{{ item.line_total|int }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2" style="padding: 10px; text-align: right; color: var(--pd-text-muted);">সাবটোটাল:</td>
+            <td style="padding: 10px; text-align: right; font-weight: 600;">৳{{ order.subtotal|int }}</td>
+          </tr>
+          {% if order.discount_amount > 0 %}
+          <tr>
+            <td colspan="2" style="padding: 10px; text-align: right; color: #166534;">কুপন ছাড়:</td>
+            <td style="padding: 10px; text-align: right; color: #166534; font-weight: 600;">-৳{{ order.discount_amount|int }}</td>
+          </tr>
+          {% endif %}
+          <tr>
+            <td colspan="2" style="padding: 10px; text-align: right; color: var(--pd-text-muted);">ডেলিভারি চার্জ:</td>
+            <td style="padding: 10px; text-align: right; font-weight: 600;">৳{{ order.delivery_fee|int }}</td>
+          </tr>
+          <tr style="font-size: 1.15rem; font-weight: 800; color: var(--pd-forest); border-top: 1.5px solid var(--pd-border);">
+            <td colspan="2" style="padding: 12px; text-align: right;">সর্বমোট প্রদেয়:</td>
+            <td style="padding: 12px; text-align: right;">৳{{ order.total|int }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- Actions -->
+    <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+      <button onclick="window.print()" class="btn btn-outline">
+        🖨️ ইনভয়েস প্রিন্ট করুন
+      </button>
+      <a href="{{ url_for('track', order_number=order.order_number, phone=order.phone) }}" class="btn btn-secondary">
+        🚚 অর্ডার ট্র্যাক করুন
+      </a>
+      <a href="{{ url_for('products') }}" class="btn btn-primary">
+        ➔ আরও কেনাকাটা করুন
+      </a>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

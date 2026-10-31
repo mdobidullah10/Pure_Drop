@@ -1,0 +1,74 @@
+{% extends "admin/layout.html" %}
+
+{% block page_title %}স্টাফ ও রোল পারমিশন ব্যবস্থাপনা (Staff & RBAC){% endblock %}
+
+{% block content %}
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+  <p style="color: var(--admin-text-muted);">
+    সুপার অ্যাডমিন হিসেবে আপনি নতুন অ্যাডমিন, অর্ডার ম্যানেজার, প্রোডাক্ট ম্যানেজার ও মডারেটর তৈরি করতে পারেন।
+  </p>
+  <a href="{{ url_for('admin_staff_new') }}" class="btn-admin btn-admin-primary">
+    + নতুন স্টাফ একাউন্ট তৈরি
+  </a>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>নাম ও ইউজারনেম</th>
+          <th>রোল (Role)</th>
+          <th>ইমেইল ও ফোন</th>
+          <th>পারমিশনসমূহ</th>
+          <th>স্ট্যাটাস</th>
+          <th>সর্বশেষ লগইন</th>
+          <th style="text-align: right;">অ্যাকশন</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in staff_members %}
+        <tr>
+          <td>
+            <strong>{{ s.name }}</strong>
+            <small style="display: block; color: var(--admin-text-muted);">@{{ s.username }}</small>
+          </td>
+          <td>
+            <span class="badge-status {% if s.role == 'super_admin' %}badge-paid{% elif s.role == 'admin' %}badge-confirmed{% else %}badge-pending{% endif %}">
+              {{ s.role }}
+            </span>
+          </td>
+          <td>
+            <div>{{ s.email or 'N/A' }}</div>
+            <small style="color: var(--admin-text-muted);">{{ s.phone or '' }}</small>
+          </td>
+          <td>
+            <small style="color: var(--admin-text-muted);">{{ s.permissions or 'Default Role Perms' }}</small>
+          </td>
+          <td>
+            {% if s.is_active == 1 %}
+              <span class="badge-status badge-paid">সক্রিয়</span>
+            {% else %}
+              <span class="badge-status badge-unpaid">স্থগিত</span>
+            {% endif %}
+          </td>
+          <td>{{ s.last_login[:16] if s.last_login else 'N/A' }}</td>
+          <td style="text-align: right; white-space: nowrap;">
+            <a href="{{ url_for('admin_staff_edit', user_id=s.id) }}" class="btn-admin btn-admin-sm btn-admin-primary">এডিট</a>
+            {% if s.role != 'super_admin' %}
+            <form action="{{ url_for('admin_staff_toggle', user_id=s.id) }}" method="POST" style="display: inline-block;">
+              <button type="submit" class="btn-admin btn-admin-sm btn-admin-secondary">
+                {% if s.is_active == 1 %}স্থগিত{% else %}সক্রিয়{% endif %}
+              </button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

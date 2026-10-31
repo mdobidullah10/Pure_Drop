@@ -1,0 +1,86 @@
+{% extends "admin/layout.html" %}
+
+{% block page_title %}ডেলিভারি চার্জ ও জোন কনফিগারেশন (Delivery Zones){% endblock %}
+
+{% block content %}
+
+<div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 32px; align-items: start;">
+  
+  <!-- Add New Zone Form -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">+ নতুন ডেলিভারি জোন</h3>
+    </div>
+    <div class="card-body">
+      <form action="{{ url_for('admin_delivery_zone_add') }}" method="POST">
+        <div class="admin-form-group">
+          <label>জোনের নাম *</label>
+          <input type="text" name="name" class="admin-input" required placeholder="যেমন: চট্টগ্রাম মেট্রো">
+        </div>
+
+        <div class="form-grid-2">
+          <div class="admin-form-group">
+            <label>ডেলিভারি ফি (৳) *</label>
+            <input type="number" step="any" name="delivery_fee" class="admin-input" required placeholder="100">
+          </div>
+          <div class="admin-form-group">
+            <label>ফ্রি ডেলিভারি সীমা (৳)</label>
+            <input type="number" step="any" name="free_delivery_threshold" class="admin-input" value="2500">
+          </div>
+        </div>
+
+        <div class="admin-form-group">
+          <label>আনুমানিক ডেলিভারি সময়</label>
+          <input type="text" name="estimated_days" class="admin-input" value="২-৩ কার্যদিবস">
+        </div>
+
+        <button type="submit" class="btn-admin btn-admin-primary" style="width: 100%; justify-content: center;">
+          ✓ জোন যোগ করুন
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delivery Zones List -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">বিদ্যমান ডেলিভারি জোন ও চার্জসমূহ</h3>
+    </div>
+    <div class="table-responsive">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>জোনের নাম</th>
+            <th>ডেলিভারি চার্জ</th>
+            <th>ফ্রি ডেলিভারি সীমা</th>
+            <th>আনুমানিক সময়</th>
+            <th style="text-align: right;">অ্যাকশন</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for z in zones %}
+          <tr>
+            <td>
+              <strong>{{ z.name }}</strong>
+              {% if z.is_default %}<span style="font-size: 0.72rem; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; margin-left: 4px;">Default</span>{% endif %}
+            </td>
+            <td>
+              <strong style="color: var(--admin-primary); font-family: 'DM Sans';">৳{{ z.delivery_fee|int }}</strong>
+            </td>
+            <td>৳{{ z.free_delivery_threshold|int }} বা বেশি</td>
+            <td>{{ z.estimated_days }}</td>
+            <td style="text-align: right;">
+              <form action="{{ url_for('admin_delivery_zone_delete', zone_id=z.id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('এই জোনটি মুছে ফেলতে চান?');">
+                <button type="submit" class="btn-admin btn-admin-sm btn-admin-danger">🗑️ মুছুন</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

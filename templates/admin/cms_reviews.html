@@ -1,0 +1,74 @@
+{% extends "admin/layout.html" %}
+
+{% block page_title %}গ্রাহক রিভিউ মডারেশন (Customer Reviews){% endblock %}
+
+{% block content %}
+
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">সকল গ্রাহক রিভিউ তালিকা ({{ reviews|length }})</h3>
+  </div>
+  <div class="table-responsive">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>পণ্য</th>
+          <th>গ্রাহক ও ফোন</th>
+          <th>রেটিং</th>
+          <th>রিভিউ মন্তব্য</th>
+          <th>স্ট্যাটাস</th>
+          <th>তারিখ</th>
+          <th style="text-align: right;">অ্যাকশন</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in reviews %}
+        <tr>
+          <td>
+            <strong>{{ r.product_name }}</strong>
+          </td>
+          <td>
+            <strong>{{ r.customer_name }}</strong>
+            <small style="display: block; color: var(--admin-text-muted);">{{ r.customer_phone or '' }}</small>
+          </td>
+          <td style="color: var(--admin-gold); font-size: 1.1rem; white-space: nowrap;">
+            {% for i in range(r.rating) %}★{% endfor %}
+          </td>
+          <td style="max-width: 320px;">
+            <p style="font-size: 0.88rem; line-height: 1.5;">{{ r.comment }}</p>
+          </td>
+          <td>
+            <span class="badge-status {% if r.status == 'approved' %}badge-paid{% elif r.status == 'rejected' %}badge-unpaid{% else %}badge-pending{% endif %}">
+              {{ r.status }}
+            </span>
+          </td>
+          <td>{{ r.created_at[:10] }}</td>
+          <td style="text-align: right; white-space: nowrap;">
+            {% if r.status != 'approved' %}
+            <form action="{{ url_for('admin_review_status', review_id=r.id, status='approved') }}" method="POST" style="display: inline-block;">
+              <button type="submit" class="btn-admin btn-admin-sm btn-admin-primary">অনুমোদন ✓</button>
+            </form>
+            {% endif %}
+            {% if r.status != 'rejected' %}
+            <form action="{{ url_for('admin_review_status', review_id=r.id, status='rejected') }}" method="POST" style="display: inline-block;">
+              <button type="submit" class="btn-admin btn-admin-sm btn-admin-secondary">প্রত্যাখ্যান ✕</button>
+            </form>
+            {% endif %}
+            <form action="{{ url_for('admin_review_delete', review_id=r.id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('এই রিভিউটি মুছে ফেলতে চান?');">
+              <button type="submit" class="btn-admin btn-admin-sm btn-admin-danger">🗑️</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 36px; color: var(--admin-text-muted);">
+            কোনো রিভিউ অপেক্ষমাণ নেই।
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

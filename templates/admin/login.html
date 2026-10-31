@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Login — Pure Drop Control Center</title>
+  
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body style="background: linear-gradient(135deg, #072518 0%, #0d3826 100%); display: grid; place-items: center; min-height: 100vh; padding: 20px;">
+
+  <div style="background: #ffffff; border-radius: 12px; max-width: 440px; width: 100%; padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+    
+    <div style="text-align: center; margin-bottom: 28px;">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Pure Drop" style="height: 60px; margin: 0 auto 12px;">
+      <h1 style="font-size: 1.6rem; font-weight: 800; color: #0d3826; margin-bottom: 4px;">অ্যাডমিন কন্ট্রোল সেন্টার</h1>
+      <p style="font-size: 0.88rem; color: #64748b;">প্রশাসনিক প্যানেলে প্রবেশ করতে তথ্য দিন</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{% if category == 'error' %}danger{% else %}success{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('admin_login') }}" method="POST">
+      <input type="hidden" name="next" value="{{ request.args.get('next', '') }}">
+
+      <div class="admin-form-group">
+        <label>ইউজারনেম বা ইমেইল *</label>
+        <input type="text" name="username" class="admin-input" required placeholder="username বা email" autofocus>
+      </div>
+
+      <div class="admin-form-group">
+        <label>পাসওয়ার্ড *</label>
+        <input type="password" name="password" class="admin-input" required placeholder="••••••••">
+      </div>
+
+      <button type="submit" class="btn-admin btn-admin-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 1rem; margin-top: 10px;">
+        লগইন করুন ➔
+      </button>
+    </form>
+
+    <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 0.82rem; color: #64748b; text-align: center;">
+      <a href="{{ url_for('home') }}" style="color: #125338; font-weight: 600; text-decoration: none;">← মূল ওয়েবসাইটে ফিরে যান</a>
+    </div>
+
+  </div>
+
+</body>
+</html>

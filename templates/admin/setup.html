@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>One-Time Super Admin Setup — Pure Drop</title>
+  
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body style="background: linear-gradient(135deg, #072518 0%, #0d3826 100%); display: grid; place-items: center; min-height: 100vh; padding: 20px;">
+
+  <div style="background: #ffffff; border-radius: 12px; max-width: 520px; width: 100%; padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+    
+    <div style="text-align: center; margin-bottom: 28px;">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Pure Drop" style="height: 60px; margin: 0 auto 14px;">
+      <h1 style="font-size: 1.6rem; font-weight: 800; color: #0d3826; margin-bottom: 6px;">Super Admin একাউন্ট সেটআপ</h1>
+      <p style="font-size: 0.9rem; color: #64748b;">
+        সিস্টেমের প্রথম সুরক্ষিত এককালীন সুপার অ্যাডমিন একাউন্ট তৈরি করুন। এই একাউন্ট তৈরি হওয়ার পর সেটআপ পেজ স্থায়ীভাবে বন্ধ হয়ে যাবে।
+      </p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{% if category == 'error' %}danger{% else %}success{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('admin_setup') }}" method="POST">
+      <div class="admin-form-group">
+        <label>আপনার পূর্ণ নাম *</label>
+        <input type="text" name="name" class="admin-input" required placeholder="যেমন: মোশাররফ হোসেন">
+      </div>
+
+      <div class="admin-form-group">
+        <label>ইউজারনেম (Login Username) *</label>
+        <input type="text" name="username" class="admin-input" required pattern="^[a-zA-Z0-9_]{3,20}$" placeholder="যেমন: superadmin">
+        <small style="color: #64748b; font-size: 0.78rem;">কমপক্ষে ৩টি অক্ষর বা নম্বর</small>
+      </div>
+
+      <div class="admin-form-group">
+        <label>ইমেইল অ্যাড্রেস *</label>
+        <input type="email" name="email" class="admin-input" required placeholder="admin@puredropbd.com">
+      </div>
+
+      <div class="admin-form-group">
+        <label>মোবাইল নম্বর *</label>
+        <input type="tel" name="phone" class="admin-input" required pattern="^01[3-9]\d{8}$" placeholder="017XXXXXXXX">
+      </div>
+
+      <div class="admin-form-group">
+        <label>শক্তিশালী পাসওয়ার্ড *</label>
+        <input type="password" name="password" class="admin-input" required minlength="8" placeholder="কমপক্ষে ৮ অক্ষরের পাসওয়ার্ড">
+      </div>
+
+      <div class="admin-form-group">
+        <label>পাসওয়ার্ড নিশ্চিত করুন *</label>
+        <input type="password" name="confirm_password" class="admin-input" required minlength="8" placeholder="পুনরায় পাসওয়ার্ড লিখুন">
+      </div>
+
+      <button type="submit" class="btn-admin btn-admin-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 1rem; margin-top: 10px;">
+        🛡️ সুপার অ্যাডমিন একাউন্ট তৈরি করুন ➔
+      </button>
+    </form>
+
+    <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; font-size: 0.8rem; color: #64748b; text-align: center;">
+      🔒 পাসওয়ার্ড স্বয়ংক্রিয়ভাবে শক্তিশালী হ্যাশ (pbkdf2:sha256) আকারে ডাটাবেজে সংরক্ষিত হবে।
+    </div>
+
+  </div>
+
+</body>
+</html>

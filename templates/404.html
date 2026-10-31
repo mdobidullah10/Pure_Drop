@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}পেজটি পাওয়া যায়নি (404 Not Found) — Pure Drop{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 80px 20px; text-align: center;">
+  <div style="font-size: 5rem; margin-bottom: 12px; color: var(--pd-forest); font-family: 'DM Sans', sans-serif; font-weight: 800;">404</div>
+  <h1 style="font-size: 2rem; font-weight: 800; color: var(--pd-forest); margin-bottom: 8px;">পেজটি খুঁজে পাওয়া যায়নি</h1>
+  <p style="color: var(--pd-text-muted); max-width: 480px; margin: 0 auto 28px;">
+    আপনি যে লিঙ্কটি খুঁজছেন তা স্থানান্তরিত হয়েছে অথবা মুছে ফেলা হয়েছে।
+  </p>
+  <div style="display: flex; justify-content: center; gap: 14px;">
+    <a href="{{ url_for('home') }}" class="btn btn-primary">হোম পেজে ফিরুন</a>
+    <a href="{{ url_for('products') }}" class="btn btn-outline">পণ্যসমূহ দেখুন</a>
+  </div>
+</div>
+{% endblock %}

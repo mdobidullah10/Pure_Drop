@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}সকল খাঁটি পণ্যসম্ভার — Pure Drop{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 0 60px;">
+  
+  <!-- Breadcrumbs & Heading -->
+  <div style="margin-bottom: 24px;">
+    <div style="font-size: 0.85rem; color: var(--pd-text-muted); margin-bottom: 8px;">
+      <a href="{{ url_for('home') }}">হোম</a> ➔ <span>পণ্যসমূহ</span>
+      {% if selected_category %} ➔ <b>{{ selected_category.name_bn }}</b>{% endif %}
+    </div>
+    <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--pd-forest);">
+      {% if selected_category %}{{ selected_category.name_bn }}{% elif search_query %}“{{ search_query }}” এর ফলাফল{% else %}আমাদের সকল প্রাকৃতিক পণ্য{% endif %}
+    </h1>
+    <p style="color: var(--pd-text-muted); font-size: 0.95rem;">শতভাগ প্রাকৃতিক ও খাঁটি উপাদানে প্রস্তুত দৈনন্দিন খাদ্যপণ্য।</p>
+  </div>
+
+  <!-- Filters & Sorting Bar -->
+  <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 32px; padding: 16px; background: #fff; border: 1px solid var(--pd-border); border-radius: var(--pd-radius-md);">
+    
+    <!-- Category Chips -->
+    <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+      <span style="font-size: 0.85rem; font-weight: 700; color: var(--pd-forest); margin-right: 4px;">ক্যাটাগরি:</span>
+      <a href="{{ url_for('products') }}" class="btn btn-sm {% if not selected_category %}btn-primary{% else %}btn-outline{% endif %}">সকল</a>
+      {% for cat in categories %}
+        <a href="{{ url_for('products', category=cat.slug) }}" class="btn btn-sm {% if selected_category and selected_category.slug == cat.slug %}btn-primary{% else %}btn-outline{% endif %}">
+          {{ cat.name_bn }}
+        </a>
+      {% endfor %}
+    </div>
+
+    <!-- Sorting -->
+    <form method="GET" action="{{ url_for('products') }}" style="display: flex; align-items: center; gap: 8px;">
+      {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category.slug }}">{% endif %}
+      {% if search_query %}<input type="hidden" name="q" value="{{ search_query }}">{% endif %}
+      <label for="sortSelect" style="font-size: 0.85rem; font-weight: 600; color: var(--pd-text-muted);">সর্ট করুন:</label>
+      <select id="sortSelect" name="sort" onchange="this.form.submit()" style="padding: 6px 12px; border: 1px solid var(--pd-border); border-radius: var(--pd-radius-sm); font-size: 0.85rem; outline: none;">
+        <option value="newest" {% if sort == 'newest' %}selected{% endif %}>নতুন পণ্য আগে</option>
+        <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>দাম: কম থেকে বেশি</option>
+        <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>দাম: বেশি থেকে কম</option>
+        <option value="rating" {% if sort == 'rating' %}selected{% endif %}>সেরা রেটিং</option>
+      </select>
+    </form>
+  </div>
+
+  <!-- Products Grid -->
+  {% if products %}
+    <div class="product-grid">
+      {% for p in products %}
+      <article class="product-card">
+        <!-- Wishlist Button -->
+        <button class="wishlist-toggle-btn" data-product-id="{{ p.id }}" style="position: absolute; top: 12px; right: 12px; z-index: 5; background: #fff; border: 1px solid var(--pd-border); border-radius: 50%; width: 34px; height: 34px; display: grid; place-items: center; cursor: pointer;" title="পছন্দের তালিকায় রাখুন">
+          ♥
+        </button>
+
+        <a href="{{ url_for('product_detail', slug=p.slug) }}" class="product-card-top">
+          {% if p.discount_price and p.discount_price < p.regular_price %}
+            {% set pct = ((p.regular_price - p.discount_price) / p.regular_price * 100)|round|int %}
+            <span class="product-badge-discount">-{{ pct }}% ছাড়</span>
+          {% endif %}
+          <img src="{{ p.main_image or '/static/images/logo.png' }}" alt="{{ p.name_bn }}" loading="lazy">
+        </a>
+
+        <div class="product-card-body">
+          <span class="product-category-sub">{{ p.category_name }}</span>
+          <h3 class="product-title">
+            <a href="{{ url_for('product_detail', slug=p.slug) }}">{{ p.name_bn }}</a>
+          </h3>
+          <div class="product-unit">প্যাক সাইজ: <b>{{ p.unit }}</b></div>
+          
+          <div class="product-rating">
+            <span>★★★★★</span>
+            <span class="count">({{ p.rating_count }} রিভিউ)</span>
+          </div>
+
+          <div class="product-card-footer">
+            <div class="price-box">
+              <span class="current-price">৳{{ (p.discount_price or p.regular_price)|int }}</span>
+              {% if p.discount_price and p.discount_price < p.regular_price %}
+                <span class="regular-price">৳{{ p.regular_price|int }}</span>
+              {% endif %}
+            </div>
+
+            <button class="btn-add-cart" onclick="addToCart({{ p.id }}, 1)">
+              + কার্টে যোগ করুন
+            </button>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 80px 20px; background: #fff; border: 1px solid var(--pd-border); border-radius: var(--pd-radius-lg);">
+      <div style="font-size: 3.5rem; margin-bottom: 16px;">🔍</div>
+      <h3 style="font-size: 1.4rem; color: var(--pd-forest); margin-bottom: 8px;">কোনো পণ্য খুঁজে পাওয়া যায়নি</h3>
+      <p style="color: var(--pd-text-muted); margin-bottom: 24px;">অনুগ্রহ করে অন্য কোনো শব্দ দিয়ে সার্চ করুন অথবা সব পণ্য ঘুরে দেখুন।</p>
+      <a href="{{ url_for('products') }}" class="btn btn-primary">সকল পণ্য দেখুন ➔</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "admin/layout.html" %}
+
+{% block page_title %}সিকিউরিটি অডিট ও অ্যাক্টিভিটি লগ (Audit Logs){% endblock %}
+
+{% block content %}
+
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">প্রশাসনিক কার্যকলাপের অডিট ট্রেইল (Recent {{ logs|length }} Logs)</h3>
+  </div>
+  <div class="table-responsive">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>সময় ও তারিখ</th>
+          <th>ব্যবহারকারী (User)</th>
+          <th>কার্যকলাপ (Action)</th>
+          <th>রিসোর্স টাইপ</th>
+          <th>বিস্তারিত বিবরণ</th>
+          <th>আইপি ঠিকানা</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for l in logs %}
+        <tr>
+          <td>{{ l.created_at }}</td>
+          <td>
+            <strong>{{ l.username }}</strong>
+            {% if l.user_id %}<small style="color: var(--admin-text-muted);"> (ID: #{{ l.user_id }})</small>{% endif %}
+          </td>
+          <td>
+            <span class="badge-status badge-confirmed">{{ l.action }}</span>
+          </td>
+          <td>{{ l.entity_type }} #{{ l.entity_id }}</td>
+          <td>
+            <small style="color: var(--admin-text-dark);">{{ l.details }}</small>
+          </td>
+          <td style="font-family: 'DM Sans'; font-size: 0.85rem; color: var(--admin-text-muted);">
+            {{ l.ip_address or 'Local' }}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 36px; color: var(--admin-text-muted);">
+            কোনো অডিট লগ রেকর্ড নেই।
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

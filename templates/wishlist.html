@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}পছন্দের তালিকা (Wishlist) — Pure Drop{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 0 60px;">
+  
+  <div style="margin-bottom: 32px;">
+    <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--pd-forest); margin-bottom: 8px;">
+      ❤️ আপনার পছন্দের তালিকা
+    </h1>
+    <p style="color: var(--pd-text-muted);">আপনার পছন্দের পণ্যগুলো এখানে সংরক্ষিত রয়েছে। সহজে কার্টে যোগ করে অর্ডার সম্পন্ন করুন।</p>
+  </div>
+
+  <div id="wishlistContainer" class="product-grid">
+    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: #fff; border: 1px solid var(--pd-border); border-radius: var(--pd-radius-lg);">
+      <div style="font-size: 3rem; margin-bottom: 14px;">❤️</div>
+      <h3 style="color: var(--pd-forest); font-size: 1.3rem; margin-bottom: 8px;">কোনো পণ্য পছন্দের তালিকায় রাখা হয়নি</h3>
+      <p style="color: var(--pd-text-muted); margin-bottom: 20px;">যেকোনো পণ্যের ওপর হার্ট আইকন ক্লিক করে তা আপনার পছন্দের তালিকায় সংরক্ষণ করতে পারেন।</p>
+      <a href="{{ url_for('products') }}" class="btn btn-primary">পণ্য দেখতে ক্লিক করুন ➔</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+  const ids = JSON.parse(localStorage.getItem('pd_wishlist') || '[]');
+  const container = document.getElementById('wishlistContainer');
+  if (!ids.length) return;
+
+  try {
+    const res = await fetch('/api/wishlist-products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids: ids })
+    });
+    const products = await res.json();
+    if (products && products.length) {
+      container.innerHTML = products.map(p => `
+        <article class="product-card">
+          <a href="/product/${p.slug || p.id}" class="product-card-top">
+            <img src="${p.main_image || '/static/images/logo.png'}" alt="${p.name_bn}">
+          </a>
+          <div class="product-card-body">
+            <span class="product-category-sub">${p.category_name}</span>
+            <h3 class="product-title">
+              <a href="/product/${p.slug || p.id}">${p.name_bn}</a>
+            </h3>
+            <div class="product-unit">${p.unit || ''}</div>
+            <div class="product-card-footer">
+              <div class="price-box">
+                <span class="current-price">৳${(p.discount_price || p.regular_price).toLocaleString()}</span>
+              </div>
+              <button class="btn-add-cart" onclick="addToCart(${p.id}, 1)">+ কার্টে</button>
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
+  } catch (e) {
+    console.error(e);
+  }
+});
+</script>
+{% endblock %}

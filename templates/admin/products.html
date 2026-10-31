@@ -1,0 +1,114 @@
+{% extends "admin/layout.html" %}
+
+{% block page_title %}পণ্য ব্যবস্থাপনা (Product Management){% endblock %}
+
+{% block content %}
+
+<!-- Header & Filter Bar -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+  
+  <!-- Search & Category Filter -->
+  <form method="GET" action="{{ url_for('admin_products') }}" style="display: flex; gap: 10px; align-items: center; flex: 1; max-width: 600px;">
+    <input type="text" name="q" value="{{ request.args.get('q', '') }}" placeholder="পণ্যের নাম বা SKU দিয়ে খুঁজুন..." class="admin-input" style="flex: 1;">
+    <select name="category" class="admin-select" style="width: 180px;" onchange="this.form.submit()">
+      <option value="">সকল ক্যাটাগরি</option>
+      {% for cat in categories %}
+        <option value="{{ cat.name_bn }}" {% if request.args.get('category') == cat.name_bn %}selected{% endif %}>{{ cat.name_bn }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn-admin btn-admin-secondary">খুঁজুন</button>
+  </form>
+
+  <div style="display: flex; gap: 10px;">
+    <a href="{{ url_for('admin_export_products') }}" class="btn-admin btn-admin-secondary">
+      📥 এক্সপোর্ট (CSV)
+    </a>
+    <a href="{{ url_for('admin_product_new') }}" class="btn-admin btn-admin-primary">
+      + নতুন পণ্য যোগ করুন
+    </a>
+  </div>
+
+</div>
+
+<!-- Products Table Card -->
+<div class="card">
+  <div class="table-responsive">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ছবি</th>
+          <th>নাম ও SKU</th>
+          <th>ক্যাটাগরি</th>
+          <th>বিক্রয় মূল্য</th>
+          <th>ক্রয় খরচ</th>
+          <th>মজুদ (Stock)</th>
+          <th>স্ট্যাটাস</th>
+          <th>হাইলাইটস</th>
+          <th style="text-align: right;">অ্যাকশন</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in products %}
+        <tr>
+          <td style="width: 60px;">
+            <img src="{{ p.main_image or '/static/images/logo.png' }}" alt="{{ p.name_bn }}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 6px; border: 1px solid var(--admin-border);">
+          </td>
+          <td>
+            <strong>{{ p.name_bn }}</strong>
+            <small style="display: block; color: var(--admin-text-muted);">{{ p.name_en or '' }} | SKU: <b>{{ p.sku }}</b></small>
+          </td>
+          <td>{{ p.category_name }}</td>
+          <td>
+            <strong style="color: var(--admin-primary); font-family: 'DM Sans', sans-serif;">
+              ৳{{ (p.discount_price or p.regular_price)|int }}
+            </strong>
+            {% if p.discount_price and p.discount_price < p.regular_price %}
+              <small style="color: var(--admin-text-muted); text-decoration: line-through; display: block;">৳{{ p.regular_price|int }}</small>
+            {% endif %}
+          </td>
+          <td style="color: var(--admin-text-muted);">৳{{ p.cost_price|int }}</td>
+          <td>
+            {% if p.stock <= p.low_stock_threshold %}
+              <span style="color: #ef4444; font-weight: 800;">⚠️ {{ p.stock }}</span>
+            {% else %}
+              <span style="color: #10b981; font-weight: 700;">{{ p.stock }}</span>
+            {% endif %}
+            <small style="color: var(--admin-text-muted);">{{ p.unit }}</small>
+          </td>
+          <td>
+            {% if p.is_active == 1 %}
+              <span class="badge-status badge-paid">সক্রিয়</span>
+            {% else %}
+              <span class="badge-status badge-unpaid">ড্রাফট</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if p.is_featured %}<span style="font-size: 0.72rem; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 3px;">Featured</span>{% endif %}
+            {% if p.is_bestseller %}<span style="font-size: 0.72rem; background: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 3px;">Bestseller</span>{% endif %}
+          </td>
+          <td style="text-align: right; white-space: nowrap;">
+            <a href="{{ url_for('product_detail', slug=p.slug) }}" target="_blank" class="btn-admin btn-admin-sm btn-admin-secondary" title="স্টোরফ্রন্টে দেখুন">👁️</a>
+            <a href="{{ url_for('admin_product_edit', product_id=p.id) }}" class="btn-admin btn-admin-sm btn-admin-primary">এডিট</a>
+            <form action="{{ url_for('admin_product_toggle', product_id=p.id) }}" method="POST" style="display: inline-block;">
+              <button type="submit" class="btn-admin btn-admin-sm btn-admin-secondary" title="স্ট্যাটাস পরিবর্তন">
+                {% if p.is_active == 1 %}পজ{% else %}সক্রিয়{% endif %}
+              </button>
+            </form>
+            <form action="{{ url_for('admin_product_delete', product_id=p.id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('আপনি কি এই পণ্যটি মুছে ফেলতে চান?');">
+              <button type="submit" class="btn-admin btn-admin-sm btn-admin-danger" title="মুছে ফেলুন">🗑️</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="9" style="text-align: center; padding: 36px; color: var(--admin-text-muted);">
+            কোনো পণ্য পাওয়া যায়নি।
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}যোগাযোগ — Pure Drop{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 0 80px; max-width: 960px;">
+  
+  <div style="text-align: center; margin-bottom: 40px;">
+    <p class="section-tag">সহায়তা ও যোগাযোগ</p>
+    <h1 style="font-size: 2.3rem; font-weight: 800; color: var(--pd-forest); margin-bottom: 8px;">
+      আমরা সবসময় আপনার পাশে আছি
+    </h1>
+    <p style="color: var(--pd-text-muted);">যেকোনো জিজ্ঞাসা, অর্ডার সংক্রান্ত প্রশ্ন বা পরামর্শে নির্দ্বিধায় আমাদের সাথে যোগাযোগ করুন।</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+    
+    <!-- Contact Info Cards -->
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+      
+      <div style="background: #fff; border: 1px solid var(--pd-border); border-radius: var(--pd-radius-md); padding: 24px; box-shadow: var(--pd-shadow-sm); display: flex; align-items: flex-start; gap: 16px;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: #eaf3ed; color: var(--pd-forest); display: grid; place-items: center; font-size: 1.4rem; flex-shrink: 0;">
+          📞
+        </div>
+        <div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--pd-forest); margin-bottom: 4px;">কাস্টমার কেয়ার হেল্পলাইন</h4>
+          <p style="font-size: 1.15rem; font-weight: 800; color: var(--pd-text-main); margin-bottom: 4px;">{{ settings.contact_phone }}</p>
+          <small style="color: var(--pd-text-muted);">প্রতিদিন সকাল ৯:০০ টা থেকে রাত ১০:০০ টা পর্যন্ত খোলা</small>
+        </div>
+      </div>
+
+      <div style="background: #fff; border: 1px solid var(--pd-border); border-radius: var(--pd-radius-md); padding: 24px; box-shadow: var(--pd-shadow-sm); display: flex; align-items: flex-start; gap: 16px;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: #e6f9f3; color: #128c7e; display: grid; place-items: center; font-size: 1.4rem; flex-shrink: 0;">
+          💬
+        </div>
+        <div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: #128c7e; margin-bottom: 4px;">হোয়াটসঅ্যাপ সাপোর্ট</h4>
+          <p style="font-size: 1.15rem; font-weight: 800; color: var(--pd-text-main); margin-bottom: 6px;">{{ settings.contact_whatsapp }}</p>
+          <a href="https://wa.me/88{{ settings.contact_whatsapp|replace('-', '')|replace(' ', '') }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline" style="color: #128c7e; border-color: #128c7e;">সরাসরি মেসেজ দিন ➔</a>
+        </div>
+      </div>
+
+      <div style="background: #fff; border: 1px solid var(--pd-border); border-radius: var(--pd-radius-md); padding: 24px; box-shadow: var(--pd-shadow-sm); display: flex; align-items: flex-start; gap: 16px;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: #fef7e0; color: #b06000; display: grid; place-items: center; font-size: 1.4rem; flex-shrink: 0;">
+          📍
+        </div>
+        <div>
+          <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--pd-forest); margin-bottom: 4px;">আমাদের অফিস ও ওয়্যারহাউজ</h4>
+          <p style="font-size: 0.95rem; color: var(--pd-text-muted); line-height: 1.6;">{{ settings.store_address }}</p>
+          <small style="color: var(--pd-text-light); margin-top: 4px; display: block;">ইমেইল: {{ settings.contact_email }}</small>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Contact Form -->
+    <div style="background: #fff; border: 1px solid var(--pd-border); border-radius: var(--pd-radius-lg); padding: 32px; box-shadow: var(--pd-shadow-md);">
+      <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--pd-forest); margin-bottom: 18px;">
+        আমাদের কাছে বার্তা পাঠান
+      </h3>
+      <form action="{{ url_for('contact_submit') }}" method="POST">
+        <div class="form-group">
+          <label>আপনার পুরো নাম *</label>
+          <input type="text" name="name" class="form-control" required placeholder="নাম লিখুন">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>মোবাইল নম্বর *</label>
+            <input type="tel" name="phone" class="form-control" required placeholder="017XXXXXXXX">
+          </div>
+          <div class="form-group">
+            <label>ইমেইল (ঐচ্ছিক)</label>
+            <input type="email" name="email" class="form-control" placeholder="example@email.com">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>বিষয়ের শিরোনাম</label>
+          <input type="text" name="subject" class="form-control" placeholder="যেমন: পণ্য সংক্রান্ত জিজ্ঞাসা">
+        </div>
+        <div class="form-group">
+          <label>আপনার বার্তা বা মন্তব্য *</label>
+          <textarea name="message" class="form-control" rows="4" required placeholder="বিস্তারিত লিখুন..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">মেসেজ পাঠান ➔</button>
+      </form>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

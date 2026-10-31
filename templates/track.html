@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}অর্ডার ট্র্যাকিং — Pure Drop{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 0 80px; max-width: 840px;">
+  
+  <div style="text-align: center; margin-bottom: 36px;">
+    <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--pd-forest); margin-bottom: 8px;">
+      🚚 লাইভ অর্ডার ট্র্যাকিং
+    </h1>
+    <p style="color: var(--pd-text-muted);">আপনার অর্ডার নম্বর ও ফোন নম্বর দিয়ে বর্তমান অবস্থান জানুন।</p>
+  </div>
+
+  <!-- Search Card -->
+  <div style="background: #fff; border: 1px solid var(--pd-border); border-radius: var(--pd-radius-lg); padding: 28px; box-shadow: var(--pd-shadow-sm); margin-bottom: 36px;">
+    <form action="{{ url_for('track') }}" method="POST" style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 16px; align-items: end;">
+      <div class="form-group" style="margin-bottom: 0;">
+        <label>অর্ডার ট্র্যাকিং নম্বর *</label>
+        <input type="text" name="order_number" value="{{ order_number or '' }}" required placeholder="যেমন: PD-20261001" class="form-control" style="text-transform: uppercase;">
+      </div>
+      <div class="form-group" style="margin-bottom: 0;">
+        <label>অর্ডার করার মোবাইল নম্বর *</label>
+        <input type="tel" name="phone" value="{{ phone or '' }}" required placeholder="017XXXXXXXX" class="form-control">
+      </div>
+      <button type="submit" class="btn btn-primary" style="height: 46px;">অনুসন্ধান 🔍</button>
+    </form>
+  </div>
+
+  {% if order %}
+  <!-- Order Tracking Result -->
+  <div style="background: #fff; border: 1px solid var(--pd-border); border-radius: var(--pd-radius-lg); padding: 36px; box-shadow: var(--pd-shadow-md);">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--pd-border); padding-bottom: 20px; margin-bottom: 32px; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <span style="font-size: 0.85rem; color: var(--pd-text-muted);">অর্ডার নম্বর:</span>
+        <h3 style="font-size: 1.5rem; font-weight: 800; color: var(--pd-forest); font-family: 'DM Sans', sans-serif;">{{ order.order_number }}</h3>
+      </div>
+      <div style="text-align: right;">
+        <span style="font-size: 0.85rem; color: var(--pd-text-muted); display: block;">বর্তমান অবস্থা:</span>
+        <span class="badge-status badge-{{ order.status|lower }}" style="font-size: 0.95rem; padding: 6px 14px; border-radius: 20px;">
+          {{ order.status }}
+        </span>
+      </div>
+    </div>
+
+    <!-- 4-Step Visual Timeline Stepper -->
+    {% set s = order.status %}
+    {% set step = 1 %}
+    {% if s in ['Confirmed', 'Processing'] %}{% set step = 2 %}{% endif %}
+    {% if s == 'Shipped' %}{% set step = 3 %}{% endif %}
+    {% if s == 'Delivered' %}{% set step = 4 %}{% endif %}
+    {% if s in ['Cancelled', 'Returned'] %}{% set step = -1 %}{% endif %}
+
+    {% if step != -1 %}
+    <div style="margin-bottom: 40px; position: relative;">
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; position: relative; z-index: 2;">
+        
+        <!-- Step 1 -->
+        <div>
+          <div style="width: 44px; height: 44px; border-radius: 50%; background: {% if step >= 1 %}var(--pd-forest){% else %}#e2e8f0{% endif %}; color: #fff; display: grid; place-items: center; margin: 0 auto 10px; font-weight: 700; font-size: 1.1rem; box-shadow: 0 0 0 4px #fff;">
+            {% if step > 1 %}✓{% else %}১{% endif %}
+          </div>
+          <strong style="display: block; font-size: 0.92rem; color: {% if step >= 1 %}var(--pd-forest){% else %}#94a3b8{% endif %};">অর্ডার গৃহীত</strong>
+          <small style="color: var(--pd-text-muted);">Order Placed</small>
+        </div>
+
+        <!-- Step 2 -->
+        <div>
+          <div style="width: 44px; height: 44px; border-radius: 50%; background: {% if step >= 2 %}var(--pd-forest){% else %}#e2e8f0{% endif %}; color: #fff; display: grid; place-items: center; margin: 0 auto 10px; font-weight: 700; font-size: 1.1rem; box-shadow: 0 0 0 4px #fff;">
+            {% if step > 2 %}✓{% else %}২{% endif %}
+          </div>
+          <strong style="display: block; font-size: 0.92rem; color: {% if step >= 2 %}var(--pd-forest){% else %}#94a3b8{% endif %};">প্রক্রিয়াধীন</strong>
+          <small style="color: var(--pd-text-muted);">Processing</small>
+        </div>
+
+        <!-- Step 3 -->
+        <div>
+          <div style="width: 44px; height: 44px; border-radius: 50%; background: {% if step >= 3 %}var(--pd-forest){% else %}#e2e8f0{% endif %}; color: #fff; display: grid; place-items: center; margin: 0 auto 10px; font-weight: 700; font-size: 1.1rem; box-shadow: 0 0 0 4px #fff;">
+            {% if step > 3 %}✓{% else %}৩{% endif %}
+          </div>
+          <strong style="display: block; font-size: 0.92rem; color: {% if step >= 3 %}var(--pd-forest){% else %}#94a3b8{% endif %};">কুরিয়ারে হস্তান্তর</strong>
+          <small style="color: var(--pd-text-muted);">In Transit</small>
+        </div>
+
+        <!-- Step 4 -->
+        <div>
+          <div style="width: 44px; height: 44px; border-radius: 50%; background: {% if step >= 4 %}var(--pd-forest){% else %}#e2e8f0{% endif %}; color: #fff; display: grid; place-items: center; margin: 0 auto 10px; font-weight: 700; font-size: 1.1rem; box-shadow: 0 0 0 4px #fff;">
+            {% if step >= 4 %}✓{% else %}৪{% endif %}
+          </div>
+          <strong style="display: block; font-size: 0.92rem; color: {% if step >= 4 %}var(--pd-forest){% else %}#94a3b8{% endif %};">ডেলিভারি সম্পন্ন</strong>
+          <small style="color: var(--pd-text-muted);">Delivered</small>
+        </div>
+
+      </div>
+
+      <!-- Connector line -->
+      <div style="position: absolute; top: 22px; left: 12%; right: 12%; height: 4px; background: #e2e8f0; z-index: 1;">
+        <div style="height: 100%; background: var(--pd-forest); width: {% if step == 1 %}0%{% elif step == 2 %}33%{% elif step == 3 %}66%{% elif step >= 4 %}100%{% endif %}; transition: width 0.5s ease;"></div>
+      </div>
+    </div>
+    {% else %}
+    <div style="background: #fee2e2; color: #991b1b; padding: 16px; border-radius: 8px; margin-bottom: 24px; text-align: center; font-weight: 600;">
+      ⚠️ এই অর্ডারটি বাতিল বা ফেরত করা হয়েছে (Status: {{ order.status }})। কোনো জিজ্ঞাসা থাকলে আমাদের হেল্পলাইনে যোগাযোগ করুন।
+    </div>
+    {% endif %}
+
+    <!-- Courier Info (if assigned) -->
+    {% if order.courier_name or order.tracking_code %}
+    <div style="background: var(--pd-ivory); border: 1px solid var(--pd-border); border-radius: var(--pd-radius-md); padding: 18px 24px; margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <span style="font-size: 0.82rem; color: var(--pd-text-muted);">ডেলিভারি পার্টনার:</span>
+        <strong style="display: block; color: var(--pd-forest); font-size: 1.05rem;">{{ order.courier_name or 'নির্ধারিত কুরিয়ার' }}</strong>
+      </div>
+      <div>
+        <span style="font-size: 0.82rem; color: var(--pd-text-muted);">কুরিয়ার ট্র্যাকিং আইডি:</span>
+        <strong style="display: block; color: var(--pd-gold); font-size: 1.05rem; font-family: 'DM Sans', sans-serif;">{{ order.tracking_code or 'N/A' }}</strong>
+      </div>
+      <div>
+        <a href="https://wa.me/88{{ settings.contact_whatsapp|replace('-', '')|replace(' ', '') }}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">সহায়তা নিন 💬</a>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Items in Order -->
+    <div>
+      <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--pd-forest); margin-bottom: 14px;">অর্ডারকৃত পণ্যসমূহ</h4>
+      <div style="border: 1px solid var(--pd-border); border-radius: var(--pd-radius-sm); overflow: hidden;">
+        {% for itm in items %}
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--pd-border); font-size: 0.95rem;">
+          <div>
+            <strong>{{ itm.product_name }}</strong>
+            <small style="color: var(--pd-text-muted); display: block;">{{ itm.variant_title or '' }}</small>
+          </div>
+          <div>{{ itm.quantity }} × ৳{{ itm.unit_price|int }} = <b>৳{{ itm.line_total|int }}</b></div>
+        </div>
+        {% endfor %}
+        <div style="padding: 12px 16px; background: var(--pd-ivory); display: flex; justify-content: space-between; font-weight: 800; font-size: 1.1rem; color: var(--pd-forest);">
+          <span>সর্বমোট পরিশোধযোগ্য:</span>
+          <span>৳{{ order.total|int }} ({{ order.payment_method }})</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

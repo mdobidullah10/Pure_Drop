@@ -1,0 +1,109 @@
+{% extends "admin/layout.html" %}
+
+{% block page_title %}{% if user %}স্টাফ একাউন্ট এডিট: {{ user.name }}{% else %}নতুন স্টাফ একাউন্ট তৈরি{% endif %}{% endblock %}
+
+{% block content %}
+
+<div style="max-width: 720px;">
+  
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">প্রশাসনিক একাউন্ট তথ্য ও রোল</h3>
+    </div>
+    <div class="card-body">
+      <form action="{% if user %}{{ url_for('admin_staff_edit', user_id=user.id) }}{% else %}{{ url_for('admin_staff_new') }}{% endif %}" method="POST">
+        
+        <div class="form-grid-2">
+          <div class="admin-form-group">
+            <label>পূর্ণ নাম *</label>
+            <input type="text" name="name" class="admin-input" required value="{{ user.name if user else '' }}" placeholder="নাম লিখুন">
+          </div>
+          <div class="admin-form-group">
+            <label>ইউজারনেম (Login Username) *</label>
+            <input type="text" name="username" class="admin-input" required value="{{ user.username if user else '' }}" placeholder="username">
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="admin-form-group">
+            <label>ইমেইল অ্যাড্রেস *</label>
+            <input type="email" name="email" class="admin-input" required value="{{ user.email if user else '' }}" placeholder="email@puredropbd.com">
+          </div>
+          <div class="admin-form-group">
+            <label>মোবাইল নম্বর *</label>
+            <input type="tel" name="phone" class="admin-input" required value="{{ user.phone if user else '' }}" placeholder="017XXXXXXXX">
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="admin-form-group">
+            <label>রোল (Account Role) *</label>
+            <select name="role" class="admin-select" required>
+              <option value="admin" {% if user and user.role == 'admin' %}selected{% endif %}>Admin (সাধারণ অ্যাডমিন)</option>
+              <option value="order_manager" {% if user and user.role == 'order_manager' %}selected{% endif %}>Order Manager (অর্ডার ব্যবস্থাপক)</option>
+              <option value="product_manager" {% if user and user.role == 'product_manager' %}selected{% endif %}>Product Manager (পণ্য ও স্টক)</option>
+              <option value="moderator" {% if user and user.role == 'moderator' %}selected{% endif %}>Moderator (রিভিউ ও কনটেন্ট)</option>
+              <option value="customer_support" {% if user and user.role == 'customer_support' %}selected{% endif %}>Customer Support (কাস্টমার সেবা)</option>
+              {% if current_admin and current_admin.role == 'super_admin' %}
+                <option value="super_admin" {% if user and user.role == 'super_admin' %}selected{% endif %}>Super Admin (পূর্ণ অধিকার)</option>
+              {% endif %}
+            </select>
+          </div>
+
+          <div class="admin-form-group">
+            <label>পাসওয়ার্ড {% if user %}(পরিবর্তন করতে চাইলে লিখুন){% else %}*{% endif %}</label>
+            <input type="password" name="password" class="admin-input" {% if not user %}required minlength="6"{% endif %} placeholder="••••••••">
+          </div>
+        </div>
+
+        <!-- Fine-Grained Permissions -->
+        <div style="margin-top: 16px; border-top: 1px solid var(--admin-border); padding-top: 16px;">
+          <label style="font-weight: 700; display: block; margin-bottom: 10px; color: var(--admin-primary);">
+            বিশেষ পারমিশন অনুমোদন (Granular Permissions):
+          </label>
+          
+          {% set perms = user.permissions|default('[]') %}
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <label class="checkbox-label">
+              <input type="checkbox" name="permissions" value="products_manage" {% if 'products_manage' in perms %}checked{% endif %}>
+              <span>পণ্য তৈরি ও এডিট (Products Manage)</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" name="permissions" value="inventory_manage" {% if 'inventory_manage' in perms %}checked{% endif %}>
+              <span>স্টক ও ইনভেন্টরি পরিবর্তন</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" name="permissions" value="orders_manage" {% if 'orders_manage' in perms %}checked{% endif %}>
+              <span>অর্ডার প্রসেস ও কুরিয়ার আপডেট</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" name="permissions" value="customers_manage" {% if 'customers_manage' in perms %}checked{% endif %}>
+              <span>গ্রাহক তথ্য ও ফোন নম্বর দর্শন</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" name="permissions" value="cms_manage" {% if 'cms_manage' in perms %}checked{% endif %}>
+              <span>ব্লগ, রেসিপি ও হোমপেজ এডিট</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" name="permissions" value="reviews_manage" {% if 'reviews_manage' in perms %}checked{% endif %}>
+              <span>গ্রাহক রিভিউ অ্যাপ্রুভ / রিজেক্ট</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" name="permissions" value="reports_export" {% if 'reports_export' in perms %}checked{% endif %}>
+              <span>রিপোর্ট ও ডাটা CSV এক্সপোর্ট</span>
+            </label>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px; display: flex; gap: 12px;">
+          <button type="submit" class="btn-admin btn-admin-primary">✓ একাউন্ট সংরক্ষণ করুন</button>
+          <a href="{{ url_for('admin_staff') }}" class="btn-admin btn-admin-secondary">বাতিল</a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

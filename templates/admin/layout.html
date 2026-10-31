@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Super Admin Control Center — Pure Drop{% endblock %}</title>
+  
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..800;1,9..40,400..800&family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body class="admin-body">
+
+  <!-- Admin Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-brand">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Pure Drop">
+      <div>
+        <div class="sidebar-brand-name">Pure <span>Drop</span></div>
+        <span class="sidebar-badge">Super Admin</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-heading">প্রধান মেনু (Main)</div>
+      <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link {% if request.path == '/admin' %}active{% endif %}">
+        <span class="icon">📊</span> <span>ড্যাশবোর্ড (Overview)</span>
+      </a>
+      <a href="{{ url_for('admin_orders') }}" class="sidebar-link {% if '/admin/orders' in request.path %}active{% endif %}">
+        <span class="icon">📦</span> <span>অর্ডারসমূহ (Orders)</span>
+      </a>
+
+      <div class="nav-heading">পণ্য ও মজুদ (Catalog)</div>
+      <a href="{{ url_for('admin_products') }}" class="sidebar-link {% if '/admin/products' in request.path %}active{% endif %}">
+        <span class="icon">🏷️</span> <span>পণ্য তালিকা (Products)</span>
+      </a>
+      <a href="{{ url_for('admin_categories') }}" class="sidebar-link {% if '/admin/categories' in request.path %}active{% endif %}">
+        <span class="icon">🗂️</span> <span>ক্যাটাগরি (Categories)</span>
+      </a>
+      <a href="{{ url_for('admin_inventory') }}" class="sidebar-link {% if '/admin/inventory' in request.path %}active{% endif %}">
+        <span class="icon">📈</span> <span>স্টক ও ইনভেন্টরি (Stock)</span>
+      </a>
+
+      <div class="nav-heading">মার্কেটিং ও সেলস (Sales)</div>
+      <a href="{{ url_for('admin_coupons') }}" class="sidebar-link {% if '/admin/coupons' in request.path %}active{% endif %}">
+        <span class="icon">🎟️</span> <span>কুপন ও ছাড় (Coupons)</span>
+      </a>
+      <a href="{{ url_for('admin_customers') }}" class="sidebar-link {% if '/admin/customers' in request.path %}active{% endif %}">
+        <span class="icon">👥</span> <span>গ্রাহক তালিকা (Customers)</span>
+      </a>
+      <a href="{{ url_for('admin_subscribers') }}" class="sidebar-link {% if '/admin/subscribers' in request.path %}active{% endif %}">
+        <span class="icon">✉️</span> <span>নিউজলেটার সাবস্ক্রাইবার</span>
+      </a>
+
+      <div class="nav-heading">ওয়েবসাইট কনটেন্ট (CMS)</div>
+      <a href="{{ url_for('admin_cms_homepage') }}" class="sidebar-link {% if '/admin/cms/homepage' in request.path %}active{% endif %}">
+        <span class="icon">🎨</span> <span>হোমপেজ এডিটর (Hero/CMS)</span>
+      </a>
+      <a href="{{ url_for('admin_cms_blog') }}" class="sidebar-link {% if '/admin/cms/blog' in request.path %}active{% endif %}">
+        <span class="icon">📝</span> <span>ব্লগ ও রেসিপি (Articles)</span>
+      </a>
+      <a href="{{ url_for('admin_cms_reviews') }}" class="sidebar-link {% if '/admin/cms/reviews' in request.path %}active{% endif %}">
+        <span class="icon">⭐</span> <span>গ্রাহক রিভিউ মডারেশন</span>
+      </a>
+
+      <div class="nav-heading">সিস্টেম ও কনফিগারেশন</div>
+      <a href="{{ url_for('admin_staff') }}" class="sidebar-link {% if '/admin/staff' in request.path %}active{% endif %}">
+        <span class="icon">🛡️</span> <span>স্টাফ ও রোল পারমিশন</span>
+      </a>
+      <a href="{{ url_for('admin_delivery_zones') }}" class="sidebar-link {% if '/admin/delivery' in request.path %}active{% endif %}">
+        <span class="icon">🚚</span> <span>ডেলিভারি চার্জ ও জোন</span>
+      </a>
+      <a href="{{ url_for('admin_payment_methods') }}" class="sidebar-link {% if '/admin/payment-methods' in request.path %}active{% endif %}">
+        <span class="icon">💳</span> <span>পেমেন্ট গেটওয়ে / মেথড</span>
+      </a>
+      <a href="{{ url_for('admin_settings') }}" class="sidebar-link {% if '/admin/settings' in request.path %}active{% endif %}">
+        <span class="icon">⚙️</span> <span>সাইট জেনারেল সেটিংস</span>
+      </a>
+      <a href="{{ url_for('admin_audit_logs') }}" class="sidebar-link {% if '/admin/audit-logs' in request.path %}active{% endif %}">
+        <span class="icon">📜</span> <span>সিকিউরিটি অডিট লগ</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <span class="user-name">{{ current_admin.name if current_admin else 'Admin' }}</span>
+        <span class="user-role">{{ current_admin.role if current_admin else 'Super Admin' }}</span>
+      </div>
+      <form action="{{ url_for('admin_logout') }}" method="POST">
+        <button type="submit" class="logout-btn" title="লগআউট করুন">🚪</button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="admin-main">
+    
+    <!-- Header -->
+    <header class="admin-header">
+      <h1>{% block page_title %}কন্ট্রোল সেন্টার{% endblock %}</h1>
+      <div class="header-tools">
+        <a href="{{ url_for('home') }}" target="_blank" class="btn-storefront">
+          🌐 স্টোরফ্রন্ট দেখুন ↗
+        </a>
+      </div>
+    </header>
+
+    <!-- Flash Messages -->
+    <div class="admin-content">
+      <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{% if category == 'error' %}danger{% else %}success{% endif %}">
+                <span>{% if category == 'error' %}⚠️{% else %}✓{% endif %}</span>
+                <span>{{ message }}</span>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <!-- Page Content -->
+      {% block content %}{% endblock %}
+    </div>
+
+  </div>
+
+  <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

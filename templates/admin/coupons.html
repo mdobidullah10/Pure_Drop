@@ -1,0 +1,113 @@
+{% extends "admin/layout.html" %}
+
+{% block page_title %}কুপন ও ছাড় ক্যাম্পেইন (Coupons & Discounts){% endblock %}
+
+{% block content %}
+
+<div style="display: grid; grid-template-columns: 1fr 1.6fr; gap: 32px; align-items: start;">
+  
+  <!-- Add Coupon Form -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">+ নতুন কুপন তৈরি করুন</h3>
+    </div>
+    <div class="card-body">
+      <form action="{{ url_for('admin_coupon_add') }}" method="POST">
+        <div class="admin-form-group">
+          <label>কুপন কোড (Coupon Code) *</label>
+          <input type="text" name="code" class="admin-input" required placeholder="যেমন: PURE10" style="text-transform: uppercase;">
+        </div>
+
+        <div class="form-grid-2">
+          <div class="admin-form-group">
+            <label>ছাড়ের ধরন (Discount Type) *</label>
+            <select name="discount_type" class="admin-select" required>
+              <option value="fixed">নির্দিষ্ট টাকা (Fixed ৳)</option>
+              <option value="percent">শতাংশ ছাড় (Percentage %)</option>
+            </select>
+          </div>
+          <div class="admin-form-group">
+            <label>ছাড়ের পরিমাণ (Value) *</label>
+            <input type="number" step="any" name="discount_value" class="admin-input" required placeholder="যেমন: 50 বা 10">
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="admin-form-group">
+            <label>সর্বনিম্ন অর্ডার মূল্য (Min Spend ৳)</label>
+            <input type="number" name="min_order_value" class="admin-input" value="500">
+          </div>
+          <div class="admin-form-group">
+            <label>সর্বোচ্চ ছাড় সীমা (Max Cap ৳)</label>
+            <input type="number" name="max_discount" class="admin-input" placeholder="যেমন: 300">
+          </div>
+        </div>
+
+        <div class="admin-form-group">
+          <label>ব্যবহারের সর্বোচ্চ সীমা (Usage Limit)</label>
+          <input type="number" name="usage_limit" class="admin-input" value="500">
+        </div>
+
+        <button type="submit" class="btn-admin btn-admin-primary" style="width: 100%; justify-content: center;">
+          ✓ কুপন তৈরি করুন
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Coupon List -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">সক্রিয় কুপন কোডসমূহ ({{ coupons|length }})</h3>
+    </div>
+    <div class="table-responsive">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>কুপন কোড</th>
+            <th>ছাড়ের ধরন ও পরিমাণ</th>
+            <th>সর্বনিম্ন অর্ডার</th>
+            <th>ব্যবহৃত সংখ্যা</th>
+            <th>স্ট্যাটাস</th>
+            <th style="text-align: right;">অ্যাকশন</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in coupons %}
+          <tr>
+            <td>
+              <strong style="color: var(--admin-primary); font-family: 'DM Sans'; font-size: 1.05rem;">
+                {{ c.code }}
+              </strong>
+            </td>
+            <td>
+              {% if c.discount_type == 'percent' %}
+                <span class="badge-status badge-confirmed">{{ c.discount_value }}% ছাড়</span>
+              {% else %}
+                <span class="badge-status badge-paid">৳{{ c.discount_value|int }} ফিক্সড</span>
+              {% endif %}
+            </td>
+            <td>৳{{ c.min_order_value|int }}</td>
+            <td>{{ c.times_used }} / {{ c.usage_limit }} বার</td>
+            <td>
+              {% if c.is_active == 1 %}
+                <span class="badge-status badge-paid">সক্রিয়</span>
+              {% else %}
+                <span class="badge-status badge-unpaid">নিষ্ক্রিয়</span>
+              {% endif %}
+            </td>
+            <td style="text-align: right;">
+              <form action="{{ url_for('admin_coupon_delete', coupon_id=c.id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('এই কুপনটি মুছে ফেলতে চান?');">
+                <button type="submit" class="btn-admin btn-admin-sm btn-admin-danger">🗑️ মুছুন</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

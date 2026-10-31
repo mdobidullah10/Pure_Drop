@@ -1,0 +1,71 @@
+{% extends "admin/layout.html" %}
+
+{% block page_title %}{% if post %}প্রবন্ধ সম্পাদনা: {{ post.title }}{% else %}নতুন প্রবন্ধ লিখুন{% endif %}{% endblock %}
+
+{% block content %}
+
+<div style="max-width: 820px;">
+  
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">প্রবন্ধের বিষয়বস্তু</h3>
+    </div>
+    <div class="card-body">
+      <form action="{% if post %}{{ url_for('admin_blog_edit', post_id=post.id) }}{% else %}{{ url_for('admin_blog_new') }}{% endif %}" method="POST">
+        
+        <div class="admin-form-group">
+          <label>প্রবন্ধের শিরোনাম *</label>
+          <input type="text" name="title" class="admin-input" required value="{{ post.title if post else '' }}" placeholder="যেমন: খাঁটি গাওয়া ঘি চেনার ৫টি উপায়">
+        </div>
+
+        <div class="form-grid-2">
+          <div class="admin-form-group">
+            <label>ইউআরএল স্লাগ (Slug) *</label>
+            <input type="text" name="slug" class="admin-input" required value="{{ post.slug if post else '' }}" placeholder="5-ways-to-identify-pure-cow-ghee">
+          </div>
+          <div class="admin-form-group">
+            <label>ক্যাটাগরি</label>
+            <input type="text" name="category" class="admin-input" value="{{ post.category if post else 'পুষ্টি ও স্বাস্থ্য' }}">
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="admin-form-group">
+            <label>লেখকের নাম</label>
+            <input type="text" name="author_name" class="admin-input" value="{{ post.author_name if post else 'Pure Drop টিম' }}">
+          </div>
+          <div class="admin-form-group">
+            <label>কভার ছবির লিংক</label>
+            <input type="text" name="cover_image" class="admin-input" value="{{ post.cover_image if post else '' }}" placeholder="/static/images/...">
+          </div>
+        </div>
+
+        <div class="admin-form-group">
+          <label>সংক্ষিপ্ত সারসংক্ষেপ (Excerpt)</label>
+          <input type="text" name="excerpt" class="admin-input" value="{{ post.excerpt if post else '' }}" placeholder="১-২ লাইনের সারমর্ম">
+        </div>
+
+        <div class="admin-form-group">
+          <label>সম্পূর্ণ বিষয়বস্তু (Full Article Content) *</label>
+          <textarea name="content" class="admin-textarea" rows="12" required placeholder="প্রবন্ধের বিস্তারিত বিষয়বস্তু লিখুন...">{{ post.content if post else '' }}</textarea>
+        </div>
+
+        <div class="admin-form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" name="is_published" value="1" {% if not post or post.is_published == 1 %}checked{% endif %}>
+            <strong>অবিলম্বে ওয়েবসাইটে প্রকাশ করুন (Published)</strong>
+          </label>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 24px;">
+          <button type="submit" class="btn-admin btn-admin-primary">✓ প্রবন্ধ সংরক্ষণ করুন</button>
+          <a href="{{ url_for('admin_cms_blog') }}" class="btn-admin btn-admin-secondary">বাতিল</a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

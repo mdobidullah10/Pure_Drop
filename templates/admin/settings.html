@@ -1,0 +1,99 @@
+{% extends "admin/layout.html" %}
+
+{% block page_title %}সাইট জেনারেল সেটিংস (Store & Brand Settings){% endblock %}
+
+{% block content %}
+
+<div style="max-width: 860px;">
+  
+  <form action="{{ url_for('admin_settings') }}" method="POST">
+    
+    <!-- 1. Brand Identity -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">১. ব্র্যান্ড আইডেন্টিটি ও পরিচিতি (Brand Identity)</h3>
+      </div>
+      <div class="card-body">
+        
+        <div class="form-grid-3">
+          <div class="admin-form-group">
+            <label>সাইটের নাম *</label>
+            <input type="text" name="site_name" class="admin-input" required value="{{ settings.site_name }}">
+          </div>
+          <div class="admin-form-group">
+            <label>বাংলা ট্যাগলাইন *</label>
+            <input type="text" name="site_tagline_bn" class="admin-input" required value="{{ settings.site_tagline_bn }}">
+          </div>
+          <div class="admin-form-group">
+            <label>English Tagline</label>
+            <input type="text" name="site_tagline_en" class="admin-input" value="{{ settings.site_tagline_en }}">
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 2. Contact & Customer Support -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">২. কন্টাক্ট ও হেল্পলাইন তথ্য (Customer Contact)</h3>
+      </div>
+      <div class="card-body">
+        
+        <div class="form-grid-3">
+          <div class="admin-form-group">
+            <label>হেল্পলাইন ফোন নম্বর *</label>
+            <input type="text" name="contact_phone" class="admin-input" required value="{{ settings.contact_phone }}">
+          </div>
+          <div class="admin-form-group">
+            <label>সরাসরি হোয়াটসঅ্যাপ নম্বর *</label>
+            <input type="text" name="contact_whatsapp" class="admin-input" required value="{{ settings.contact_whatsapp }}">
+          </div>
+          <div class="admin-form-group">
+            <label>সাপোর্ট ইমেইল *</label>
+            <input type="email" name="contact_email" class="admin-input" required value="{{ settings.contact_email }}">
+          </div>
+        </div>
+
+        <div class="admin-form-group">
+          <label>অফিস ও ওয়্যারহাউজ ঠিকানা *</label>
+          <input type="text" name="store_address" class="admin-input" required value="{{ settings.store_address }}">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 3. Social Media Links -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">৩. সোশ্যাল মিডিয়া লিংক (Social Media)</h3>
+      </div>
+      <div class="card-body">
+        
+        <div class="form-grid-3">
+          <div class="admin-form-group">
+            <label>ফেসবুক পেজ লিংক (Facebook)</label>
+            <input type="url" name="facebook_url" class="admin-input" value="{{ settings.facebook_url }}">
+          </div>
+          <div class="admin-form-group">
+            <label>ইনস্টাগ্রাম প্রোফাইল (Instagram)</label>
+            <input type="url" name="instagram_url" class="admin-input" value="{{ settings.instagram_url }}">
+          </div>
+          <div class="admin-form-group">
+            <label>ইউটিউব চ্যানেল (YouTube)</label>
+            <input type="url" name="youtube_url" class="admin-input" value="{{ settings.youtube_url }}">
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <button type="submit" class="btn-admin btn-admin-primary" style="padding: 12px 32px; font-size: 1rem;">
+      ✓ সেটিংস সংরক্ষণ করুন
+    </button>
+
+  </form>
+
+</div>
+
+{% endblock %}

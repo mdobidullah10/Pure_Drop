@@ -1,0 +1,68 @@
+{% extends "admin/layout.html" %}
+
+{% block page_title %}ব্লগ ও রেসিপি প্রবন্ধ ব্যবস্থাপনা (Blog CMS){% endblock %}
+
+{% block content %}
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+  <p style="color: var(--admin-text-muted);">
+    গ্রাহকদের জন্য সচেতনতামূলক পোস্ট, খাঁটি খাবারের পুষ্টি টিপস ও রান্নার রেসিপি প্রকাশ করুন।
+  </p>
+  <a href="{{ url_for('admin_blog_new') }}" class="btn-admin btn-admin-primary">
+    + নতুন প্রবন্ধ লিখুন
+  </a>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ছবি</th>
+          <th>শিরোনাম ও ক্যাটাগরি</th>
+          <th>লেখক</th>
+          <th>তারিখ</th>
+          <th>স্ট্যাটাস</th>
+          <th style="text-align: right;">অ্যাকশন</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for post in posts %}
+        <tr>
+          <td style="width: 60px;">
+            <img src="{{ post.cover_image or '/static/images/logo.png' }}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 6px; border: 1px solid var(--admin-border);">
+          </td>
+          <td>
+            <strong>{{ post.title }}</strong>
+            <small style="display: block; color: var(--admin-text-muted);">{{ post.category }} | slug: {{ post.slug }}</small>
+          </td>
+          <td>{{ post.author_name }}</td>
+          <td>{{ post.created_at[:10] }}</td>
+          <td>
+            {% if post.is_published == 1 %}
+              <span class="badge-status badge-paid">প্রকাশিত</span>
+            {% else %}
+              <span class="badge-status badge-unpaid">ড্রাফট</span>
+            {% endif %}
+          </td>
+          <td style="text-align: right; white-space: nowrap;">
+            <a href="{{ url_for('blog_detail', slug=post.slug) }}" target="_blank" class="btn-admin btn-admin-sm btn-admin-secondary">👁️</a>
+            <a href="{{ url_for('admin_blog_edit', post_id=post.id) }}" class="btn-admin btn-admin-sm btn-admin-primary">এডিট</a>
+            <form action="{{ url_for('admin_blog_delete', post_id=post.id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('এই পোস্টটি মুছে ফেলতে চান?');">
+              <button type="submit" class="btn-admin btn-admin-sm btn-admin-danger">🗑️ মুছুন</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 36px; color: var(--admin-text-muted);">
+            কোনো ব্লগ পোস্ট পাওয়া যায়নি।
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

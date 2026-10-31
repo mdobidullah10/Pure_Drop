@@ -1,0 +1,201 @@
+{% extends "admin/layout.html" %}
+
+{% block page_title %}{% if product %}পণ্য সম্পাদনা: {{ product.name_bn }}{% else %}নতুন পণ্য যোগ করুন{% endif %}{% endblock %}
+
+{% block content %}
+
+<div style="max-width: 960px;">
+  
+  <form action="{% if product %}{{ url_for('admin_product_edit', product_id=product.id) }}{% else %}{{ url_for('admin_product_new') }}{% endif %}" method="POST" enctype="multipart/form-data">
+    
+    <!-- 1. Basic Info Card -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">১. সাধারণ তথ্যাবলী (Basic Information)</h3>
+      </div>
+      <div class="card-body">
+        
+        <div class="form-grid-2">
+          <div class="admin-form-group">
+            <label>পণ্যের নাম (বাংলায়) *</label>
+            <input type="text" name="name_bn" class="admin-input" required value="{{ product.name_bn if product else '' }}" placeholder="যেমন: প্রিমিয়াম খাঁটি দেশি গাওয়া ঘি">
+          </div>
+          <div class="admin-form-group">
+            <label>পণ্যের নাম (English)</label>
+            <input type="text" name="name_en" class="admin-input" value="{{ product.name_en if product else '' }}" placeholder="e.g. Premium Pure Cow Ghee">
+          </div>
+        </div>
+
+        <div class="form-grid-3">
+          <div class="admin-form-group">
+            <label>ইউআরএল স্লাগ (Slug) *</label>
+            <input type="text" name="slug" class="admin-input" required value="{{ product.slug if product else '' }}" placeholder="premium-pure-cow-ghee">
+          </div>
+          <div class="admin-form-group">
+            <label>এসকেইউ (SKU Code) *</label>
+            <input type="text" name="sku" class="admin-input" required value="{{ product.sku if product else '' }}" placeholder="PD-GHEE-001">
+          </div>
+          <div class="admin-form-group">
+            <label>ক্যাটাগরি *</label>
+            <select name="category_id" class="admin-select" required>
+              {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if product and product.category_id == cat.id %}selected{% endif %}>{{ cat.name_bn }} ({{ cat.name_en }})</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="admin-form-group">
+          <label>সংক্ষিপ্ত বিবরণ (Short Description)</label>
+          <input type="text" name="short_desc" class="admin-input" value="{{ product.short_desc if product else '' }}" placeholder="পণ্যের সংক্ষেপিত ১-২ লাইনের পরিচিতি">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 2. Pricing & Stock Card -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">২. মূল্য ও মজুদ ব্যবস্থাপনা (Pricing & Inventory)</h3>
+      </div>
+      <div class="card-body">
+        
+        <div class="form-grid-3">
+          <div class="admin-form-group">
+            <label>নিয়মিত বিক্রয় মূল্য (Regular Price ৳) *</label>
+            <input type="number" step="any" name="regular_price" class="admin-input" required value="{{ product.regular_price if product else '' }}" placeholder="1450">
+          </div>
+          <div class="admin-form-group">
+            <label>ছাড়ের বিশেষ মূল্য (Discount Price ৳)</label>
+            <input type="number" step="any" name="discount_price" class="admin-input" value="{{ product.discount_price if product and product.discount_price else '' }}" placeholder="1350">
+            <small style="color: var(--admin-text-muted);">ছাড় না থাকলে ফাঁকা রাখুন</small>
+          </div>
+          <div class="admin-form-group">
+            <label>ক্রয় খরচ (Purchase Cost Price ৳)</label>
+            <input type="number" step="any" name="cost_price" class="admin-input" value="{{ product.cost_price if product else '0' }}" placeholder="1050">
+            <small style="color: var(--admin-text-muted);">লাভের হিসাবের জন্য</small>
+          </div>
+        </div>
+
+        <div class="form-grid-3">
+          <div class="admin-form-group">
+            <label>মজুদ পরিমাণ (Stock Quantity) *</label>
+            <input type="number" name="stock" class="admin-input" required value="{{ product.stock if product else '50' }}" min="0">
+          </div>
+          <div class="admin-form-group">
+            <label>স্বল্প মজুদ সীমা (Low Stock Alert Threshold)</label>
+            <input type="number" name="low_stock_threshold" class="admin-input" value="{{ product.low_stock_threshold if product else '10' }}" min="1">
+          </div>
+          <div class="admin-form-group">
+            <label>প্যাক সাইজ / একক (Unit) *</label>
+            <input type="text" name="unit" class="admin-input" required value="{{ product.unit if product else '৫০০ গ্রাম' }}" placeholder="যেমন: ৫০০ গ্রাম, ১ লিটার, ১ কেজি">
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 3. Images Card -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">৩. পণ্যের ছবি ও গ্যালারি (Product Images)</h3>
+      </div>
+      <div class="card-body">
+        
+        <div style="display: grid; grid-template-columns: 140px 1fr; gap: 24px; align-items: start;">
+          <div>
+            <label style="font-weight: 600; display: block; margin-bottom: 6px;">ছবি প্রিভিউ:</label>
+            <img id="mainImagePreview" src="{{ product.main_image if product and product.main_image else '/static/images/logo.png' }}" style="width: 140px; height: 140px; object-fit: cover; border-radius: 8px; border: 1.5px solid var(--admin-border); background: #f8fafc;">
+          </div>
+          
+          <div>
+            <div class="admin-form-group">
+              <label>প্রধান ছবির লিংক (Main Image URL)</label>
+              <input type="text" name="main_image" id="mainImageUrlInput" class="admin-input image-url-preview-input" data-preview-target="mainImagePreview" value="{{ product.main_image if product else '' }}" placeholder="https://... অথবা /static/images/...">
+            </div>
+            <div class="admin-form-group">
+              <label>অথবা নতুন ফাইল আপলোড করুন (Local File Upload)</label>
+              <input type="file" name="image_file" accept="image/*" class="admin-input">
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 4. Detailed Description, Ingredients & Usage -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">৪. পুষ্টি তথ্য ও বিস্তারিত বিবরণ (Specifications)</h3>
+      </div>
+      <div class="card-body">
+        
+        <div class="admin-form-group">
+          <label>বিস্তারিত পণ্যের বিবরণ (Full Description)</label>
+          <textarea name="description" class="admin-textarea" rows="5" placeholder="পণ্যের বিস্তারিত প্রস্তুতপ্রণালী, ঐতিহ্য ও বিশেষত্ব...">{{ product.description if product else '' }}</textarea>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="admin-form-group">
+            <label>উপাদানসমূহ (Ingredients)</label>
+            <input type="text" name="ingredients" class="admin-input" value="{{ product.ingredients if product else '' }}" placeholder="যেমন: ১০০% খাঁটি গাভীর দুধের মাখন">
+          </div>
+          <div class="admin-form-group">
+            <label>পুষ্টিগুণ (Nutrition Info)</label>
+            <input type="text" name="nutrition" class="admin-input" value="{{ product.nutrition if product else '' }}" placeholder="ভিটামিন এ, ডি, ওমেগা-৩ ফ্যাটি এসিড সমৃদ্ধ">
+          </div>
+        </div>
+
+        <div class="admin-form-group">
+          <label>ব্যবহারের নিয়ম ও সংরক্ষণ পদ্ধতি (Usage & Storage)</label>
+          <textarea name="usage_instructions" class="admin-textarea" rows="2" placeholder="সংরক্ষণ ও সেবনের নিয়মাবলী...">{{ product.usage_instructions if product else '' }}</textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 5. Status & Visibility Flags -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">৫. স্ট্যাটাস ও ডিসপ্লে সেটিংস (Flags)</h3>
+      </div>
+      <div class="card-body">
+        <div style="display: flex; gap: 28px; flex-wrap: wrap;">
+          <label class="checkbox-label">
+            <input type="checkbox" name="is_active" {% if not product or product.is_active == 1 %}checked{% endif %}>
+            <strong>পণ্যটি ওয়েবসাইটে সরাসরি দৃশ্যমান (Active)</strong>
+          </label>
+
+          <label class="checkbox-label">
+            <input type="checkbox" name="is_featured" {% if product and product.is_featured %}checked{% endif %}>
+            <span>ফিচারড পণ্য (Featured)</span>
+          </label>
+
+          <label class="checkbox-label">
+            <input type="checkbox" name="is_bestseller" {% if product and product.is_bestseller %}checked{% endif %}>
+            <span>সেরা বিক্রিত (Best Seller)</span>
+          </label>
+
+          <label class="checkbox-label">
+            <input type="checkbox" name="is_new" {% if product and product.is_new %}checked{% endif %}>
+            <span>নতুন আগমন (New Arrival)</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Button Bar -->
+    <div style="display: flex; gap: 14px; margin-bottom: 40px;">
+      <button type="submit" class="btn-admin btn-admin-primary" style="padding: 12px 28px; font-size: 1rem;">
+        ✓ পণ্য সংরক্ষণ করুন
+      </button>
+      <a href="{{ url_for('admin_products') }}" class="btn-admin btn-admin-secondary" style="padding: 12px 24px;">
+        বাতিল করুন
+      </a>
+    </div>
+
+  </form>
+
+</div>
+
+{% endblock %}

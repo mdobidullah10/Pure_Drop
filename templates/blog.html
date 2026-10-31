@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}ব্লগ ও রান্নার রেসিপি — Pure Drop{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 0 60px;">
+  
+  <div style="margin-bottom: 36px; text-align: center;">
+    <p class="section-tag">খাদ্য ও জীবনধারা</p>
+    <h1 style="font-size: 2.4rem; font-weight: 800; color: var(--pd-forest); margin-bottom: 8px;">
+      Pure Drop ব্লগ ও রান্নার রেসিপি
+    </h1>
+    <p style="color: var(--pd-text-muted); max-width: 600px; margin: 0 auto;">
+      খাঁটি খাবারের পুষ্টিগুণ, ভেজাল শনাক্তকরণের উপায় এবং ঐতিহ্যবাহী রান্নার স্বাদ বৃদ্ধির সহজ টিপস।
+    </p>
+  </div>
+
+  <div class="blog-grid">
+    {% for post in posts %}
+    <article class="blog-card">
+      <a href="{{ url_for('blog_detail', slug=post.slug) }}" class="blog-card-img">
+        <img src="{{ post.cover_image or '/static/images/poster_natural.png' }}" alt="{{ post.title }}" loading="lazy">
+      </a>
+      <div class="blog-card-body">
+        <span class="blog-category">{{ post.category }}</span>
+        <h3 class="blog-title">
+          <a href="{{ url_for('blog_detail', slug=post.slug) }}">{{ post.title }}</a>
+        </h3>
+        <p class="blog-excerpt">{{ post.excerpt|truncate(120) }}</p>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--pd-border); padding-top: 12px; margin-top: 12px; font-size: 0.8rem; color: var(--pd-text-light);">
+          <span>✍️ {{ post.author_name }}</span>
+          <a href="{{ url_for('blog_detail', slug=post.slug) }}" style="color: var(--pd-forest); font-weight: 700;">পড়ুন ➔</a>
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

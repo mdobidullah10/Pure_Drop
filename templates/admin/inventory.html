@@ -1,0 +1,84 @@
+{% extends "admin/layout.html" %}
+
+{% block page_title %}স্টক ও ইনভেন্টরি কন্ট্রোল (Inventory & Stock History){% endblock %}
+
+{% block content %}
+
+<!-- Metrics -->
+<div class="metrics-grid">
+  <div class="metric-card">
+    <div class="metric-icon-wrap green">📦</div>
+    <div class="metric-details">
+      <small>মোট সক্রিয় পণ্য</small>
+      <strong>{{ total_products }} টি</strong>
+    </div>
+  </div>
+  <div class="metric-card">
+    <div class="metric-icon-wrap gold">⚠️</div>
+    <div class="metric-details">
+      <small>স্বল্প মজুদের পণ্য</small>
+      <strong style="color: #d97706;">{{ low_stock_count }} টি</strong>
+    </div>
+  </div>
+</div>
+
+<!-- Stock Management Table -->
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">পণ্য স্টক তালিকা ও কুইক এডজাস্টমেন্ট</h3>
+    <div style="display: flex; gap: 8px;">
+      <a href="{{ url_for('admin_inventory') }}" class="btn-admin btn-admin-sm {% if not request.args.get('filter') %}btn-admin-primary{% else %}btn-admin-secondary{% endif %}">সকল পণ্য</a>
+      <a href="{{ url_for('admin_inventory', filter='low') }}" class="btn-admin btn-admin-sm {% if request.args.get('filter') == 'low' %}btn-admin-primary{% else %}btn-admin-secondary{% endif %}">⚠️ শুধুমাত্র লো স্টক</a>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>পণ্য</th>
+          <th>ক্যাটাগরি</th>
+          <th>বিক্রয় মূল্য</th>
+          <th>বর্তমান স্টক</th>
+          <th>সতর্কতা সীমা</th>
+          <th>দ্রুত স্টক পরিবর্তন</th>
+          <th style="text-align: right;">অ্যাকশন</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in products %}
+        <tr>
+          <td>
+            <strong>{{ p.name_bn }}</strong>
+            <small style="display: block; color: var(--admin-text-muted);">SKU: {{ p.sku }} | {{ p.unit }}</small>
+          </td>
+          <td>{{ p.category_name }}</td>
+          <td>৳{{ (p.discount_price or p.regular_price)|int }}</td>
+          <td>
+            <strong id="stockVal_{{ p.id }}" style="font-size: 1.15rem; font-family: 'DM Sans'; {% if p.stock <= p.low_stock_threshold %}color: #ef4444;{% else %}color: #10b981;{% endif %}">
+              {{ p.stock }}
+            </strong>
+          </td>
+          <td>{{ p.low_stock_threshold }}</td>
+          <td>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <button onclick="adjustStock({{ p.id }}, -5)" class="btn-admin btn-admin-sm btn-admin-secondary">-৫</button>
+              <button onclick="adjustStock({{ p.id }}, -1)" class="btn-admin btn-admin-sm btn-admin-secondary">-১</button>
+              <button onclick="adjustStock({{ p.id }}, 5)" class="btn-admin btn-admin-sm btn-admin-secondary">+৫</button>
+              <button onclick="adjustStock({{ p.id }}, 10)" class="btn-admin btn-admin-sm btn-admin-secondary">+১০</button>
+              <button onclick="adjustStock({{ p.id }}, 50)" class="btn-admin btn-admin-sm btn-admin-secondary">+৫০</button>
+            </div>
+          </td>
+          <td style="text-align: right;">
+            <a href="{{ url_for('admin_product_edit', product_id=p.id) }}" class="btn-admin btn-admin-sm btn-admin-primary">
+              পণ্য এডিট ➔
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

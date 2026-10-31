@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ settings.site_name }} — {{ settings.site_tagline_bn }}{% endblock %}</title>
+  <meta name="description" content="Pure Drop — খাঁটি দেশি ঘি, সুন্দরবনের প্রাকৃতিক মধু, কাঠের ঘানি ভাঙা সরিষার তেল ও অর্গানিক খাবার।">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+  
+  <!-- Google Fonts: Hind Siliguri (Bangla) & Inter / DM Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..800;1,9..40,400..800&family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pure-drop.css') }}">
+</head>
+<body>
+
+  <!-- Announcement Bar -->
+  {% if settings.announcement_enabled == '1' %}
+  <aside class="announcement-bar">
+    <div class="container announcement-inner">
+      <div class="announcement-text">
+        <span class="tag">বিশেষ অফার</span>
+        <span>{{ settings.announcement_text }}</span>
+        {% if settings.announcement_link %}
+          <a href="{{ settings.announcement_link }}" style="text-decoration: underline; color: #fff; margin-left: 6px;">বিস্তারিত দেখুন ↗</a>
+        {% endif %}
+      </div>
+      <div class="announcement-links">
+        <a href="{{ url_for('track') }}">🚚 অর্ডার ট্র্যাকিং</a>
+        <span>|</span>
+        <a href="https://wa.me/88{{ settings.contact_whatsapp|replace('-', '')|replace(' ', '') }}" target="_blank" rel="noopener">WhatsApp: {{ settings.contact_whatsapp }}</a>
+      </div>
+    </div>
+  </aside>
+  {% endif %}
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="container header-main">
+      
+      <!-- Brand Logo -->
+      <a class="brand-logo-wrap" href="{{ url_for('home') }}">
+        <img class="brand-logo-img" src="{{ url_for('static', filename='images/logo.png') }}" alt="Pure Drop Logo">
+        <div class="brand-titles">
+          <span class="brand-name">Pure <span class="drop">Drop</span></span>
+          <span class="brand-tagline">{{ settings.site_tagline_bn }}</span>
+        </div>
+      </a>
+
+      <!-- Live Search Bar -->
+      <div class="header-search">
+        <form class="search-input-wrap" action="{{ url_for('products') }}" method="GET">
+          <input type="text" name="q" value="{{ request.args.get('q', '') }}" placeholder="ঘি, মধু, সরিষার তেল খুঁজুন..." autocomplete="off">
+          <button type="submit" aria-label="অনুসন্ধান">🔍</button>
+        </form>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="header-actions">
+        <!-- Direct Phone/WhatsApp -->
+        <a class="whatsapp-link" href="https://wa.me/88{{ settings.contact_whatsapp|replace('-', '')|replace(' ', '') }}" target="_blank" rel="noopener" title="হোয়াটসঅ্যাপে যোগাযোগ">
+          <span>💬</span>
+          <span style="font-size: 0.82rem;">{{ settings.contact_phone }}</span>
+        </a>
+
+        <!-- Wishlist -->
+        <a class="action-pill" href="{{ url_for('wishlist') }}" title="পছন্দের তালিকা">
+          <span>❤️</span>
+          <span class="badge wishlist-count-badge">0</span>
+        </a>
+
+        <!-- Cart Trigger Button -->
+        <button class="action-pill cart-open-btn" style="border: none;" title="শপিং কার্ট">
+          <span>🛒 কার্ট</span>
+          <span class="badge cart-count-badge">{{ cart_count }}</span>
+        </button>
+
+        <!-- Customer Login / Account -->
+        {% if session.get('customer_id') %}
+          <a class="action-pill" href="{{ url_for('customer_account') }}">
+            <span>👤 প্রোফাইল</span>
+          </a>
+        {% else %}
+          <a class="action-pill" href="{{ url_for('customer_login') }}">
+            <span>👤 লগইন</span>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <nav class="site-nav">
+      <div class="container">
+        <ul class="nav-links">
+          <li><a href="{{ url_for('home') }}" class="{% if request.path == '/' %}active{% endif %}">হোম</a></li>
+          <li><a href="{{ url_for('products') }}" class="{% if request.path == '/products' and not request.args.get('category') %}active{% endif %}">সকল পণ্য</a></li>
+          {% for cat in nav_categories %}
+            <li><a href="{{ url_for('products', category=cat.slug) }}" class="{% if request.args.get('category') == cat.slug %}active{% endif %}">{{ cat.name_bn }}</a></li>
+          {% endfor %}
+          <li><a href="{{ url_for('blog') }}" class="{% if '/blog' in request.path %}active{% endif %}">ব্লগ ও রেসিপি</a></li>
+          <li><a href="{{ url_for('about') }}" class="{% if request.path == '/about' %}active{% endif %}">আমাদের সম্পর্কে</a></li>
+          <li><a href="{{ url_for('contact') }}" class="{% if request.path == '/contact' %}active{% endif %}">যোগাযোগ</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Flash Messages -->
+  <div class="container" style="margin-top: 16px;">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div style="padding: 12px 18px; border-radius: 8px; margin-bottom: 12px; font-weight: 500; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; {% if category == 'error' %}background: #fee2e2; color: #991b1b; border: 1px solid #fecaca;{% else %}background: #eaf3ed; color: #165339; border: 1px solid #b7dfc8;{% endif %}">
+            <span>{% if category == 'error' %}⚠️{% else %}✓{% endif %}</span>
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Main Content -->
+  <main style="flex: 1;">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Cart Drawer Component -->
+  <div class="cart-drawer-overlay" id="cartDrawerOverlay"></div>
+  <div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+      <h3>🛍️ শপিং কার্ট</h3>
+      <button class="cart-drawer-close" id="cartDrawerClose" aria-label="বন্ধ করুন">&times;</button>
+    </div>
+    <div class="cart-drawer-body" id="cartDrawerItems">
+      <div style="text-align: center; padding: 40px; color: #64748b;">লোড হচ্ছে...</div>
+    </div>
+    <div class="cart-drawer-footer">
+      <div class="cart-subtotal-row">
+        <span>সাবটোটাল:</span>
+        <span id="cartDrawerSubtotal">৳০</span>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <a href="{{ url_for('cart') }}" class="btn btn-outline" style="flex: 1; text-align: center;">কার্ট দেখুন</a>
+        <a href="{{ url_for('checkout') }}" class="btn btn-primary" style="flex: 1; text-align: center;">চেকআউট ➔</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        
+        <!-- Brand Info -->
+        <div class="footer-col">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" style="height: 44px; filter: brightness(1.2);" alt="Pure Drop">
+            <h3 style="font-size: 1.4rem; color: #fff; font-weight: 800;">Pure <span style="color: var(--pd-gold);">Drop</span></h3>
+          </div>
+          <p>{{ settings.story_content|truncate(160) }}</p>
+          <div style="display: flex; gap: 12px; margin-top: 14px;">
+            {% if settings.facebook_url %}<a href="{{ settings.facebook_url }}" target="_blank" rel="noopener" style="color: #fff; font-size: 1.2rem;">📘 Facebook</a>{% endif %}
+            {% if settings.instagram_url %}<a href="{{ settings.instagram_url }}" target="_blank" rel="noopener" style="color: #fff; font-size: 1.2rem; margin-left: 10px;">📷 Instagram</a>{% endif %}
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-col">
+          <h4>প্রয়োজনীয় লিংক</h4>
+          <ul class="footer-links">
+            <li><a href="{{ url_for('home') }}">হোম পেজ</a></li>
+            <li><a href="{{ url_for('products') }}">সকল পণ্যসমূহ</a></li>
+            <li><a href="{{ url_for('track') }}">অর্ডার ট্র্যাকিং</a></li>
+            <li><a href="{{ url_for('blog') }}">ব্লগ ও রান্নার রেসিপি</a></li>
+            <li><a href="{{ url_for('about') }}">আমাদের সম্পর্কে</a></li>
+            <li><a href="{{ url_for('policy') }}">ডেলিভারি ও রিটার্ন পলিসি</a></li>
+          </ul>
+        </div>
+
+        <!-- Customer Service -->
+        <div class="footer-col">
+          <h4>কাস্টমার সাপোর্ট</h4>
+          <div class="footer-contact-list">
+            <div>📞 হেল্পলাইন: <strong>{{ settings.contact_phone }}</strong></div>
+            <div>💬 WhatsApp: <strong>{{ settings.contact_whatsapp }}</strong></div>
+            <div>✉️ ইমেইল: <strong>{{ settings.contact_email }}</strong></div>
+            <div>📍 ঠিকানা: {{ settings.store_address }}</div>
+            <div style="font-size: 0.8rem; color: var(--pd-gold-light); margin-top: 4px;">সকাল ৯টা থেকে রাত ১০টা পর্যন্ত গ্রাহক সেবা</div>
+          </div>
+        </div>
+
+        <!-- Payment Methods & Security -->
+        <div class="footer-col">
+          <h4>নিরাপদ পেমেন্ট ব্যবস্থা</h4>
+          <p>আমাদের সকল পণ্যে ক্যাশ অন ডেলিভারি এবং ভেরিফাইড মোবাইল ব্যাংকিং সুবিধা রয়েছে।</p>
+          <div class="payment-badges-row">
+            <span class="payment-badge">ক্যাশ অন ডেলিভারি</span>
+            <span class="payment-badge">bKash</span>
+            <span class="payment-badge">Nagad</span>
+            <span class="payment-badge">Rocket</span>
+          </div>
+          <div style="margin-top: 18px;">
+            <a href="{{ url_for('admin_login') }}" style="font-size: 0.78rem; color: rgba(255,255,255,0.4);">অ্যাডমিন লগইন 🔒</a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Copyright Bar -->
+      <div class="footer-bottom">
+        <div class="footer-bottom-inner">
+          <div>© 2026 Pure Drop. সর্বস্বত্ব সংরক্ষিত। <span>“প্রকৃতির বিশুদ্ধতা, পরিবারের সুস্থতা”</span></div>
+          <div style="display: flex; gap: 16px;">
+            <a href="{{ url_for('policy') }}">প্রাইভেসি পলিসি</a>
+            <span>•</span>
+            <a href="{{ url_for('policy') }}">শর্তাবলী</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

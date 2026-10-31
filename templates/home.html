@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block title %}Pure Drop — {{ settings.site_tagline_bn }} | খাঁটি খাদ্যপণ্যের অনলাইন শপ{% endblock %}
+
+{% block content %}
+
+<!-- 1. SIGNATURE HERO SECTION -->
+<section class="hero-section">
+  <div class="container hero-grid">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span>🌿</span>
+        <span>{{ settings.hero_badge }}</span>
+      </div>
+      <h1 class="hero-title">{{ settings.hero_headline }}</h1>
+      <p class="hero-subtitle">{{ settings.hero_subtitle }}</p>
+      
+      <div class="hero-ctas">
+        <a href="{{ settings.hero_primary_btn_link }}" class="btn btn-primary btn-lg">
+          {{ settings.hero_primary_btn_text }} ➔
+        </a>
+        <a href="{{ settings.hero_secondary_btn_link }}" class="btn btn-outline btn-lg">
+          {{ settings.hero_secondary_btn_text }}
+        </a>
+      </div>
+
+      <div style="margin-top: 32px; display: flex; align-items: center; gap: 20px; font-size: 0.88rem; color: var(--pd-text-muted);">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span style="color: var(--pd-gold); font-size: 1.1rem;">★</span>
+          <span><b>৪.৯/৫</b> রেটিংপ্রাপ্ত</span>
+        </div>
+        <span>•</span>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span>🚚</span>
+          <span>সারা দেশে হোম ডেলিভারি</span>
+        </div>
+        <span>•</span>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span>🛡️</span>
+          <span>১০০% ক্যাশ অন ডেলিভারি</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero Visual -->
+    <div class="hero-visual-wrap">
+      <div class="hero-card-poster">
+        <img src="{{ settings.hero_image }}" alt="Pure Drop খাঁটি খাবার" loading="eager">
+      </div>
+      <div class="hero-floating-badge">
+        <div class="floating-icon">🌱</div>
+        <div>
+          <strong style="display: block; font-size: 0.92rem; color: var(--pd-forest);">১০০% প্রাকৃতিক</strong>
+          <small style="color: var(--pd-text-muted);">কোনো কৃত্রিম ফ্লেভার বা কেমিক্যাল নেই</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. TRUST HIGHLIGHTS -->
+<section class="trust-strip">
+  <div class="container">
+    <div class="trust-grid">
+      <div class="trust-item">
+        <div class="trust-icon">🛍️</div>
+        <div class="trust-info">
+          <h4>{{ settings.trust_item_1_title }}</h4>
+          <p>{{ settings.trust_item_1_desc }}</p>
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">🎧</div>
+        <div class="trust-info">
+          <h4>{{ settings.trust_item_2_title }}</h4>
+          <p>{{ settings.trust_item_2_desc }}</p>
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">📦</div>
+        <div class="trust-info">
+          <h4>{{ settings.trust_item_3_title }}</h4>
+          <p>{{ settings.trust_item_3_desc }}</p>
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">💳</div>
+        <div class="trust-info">
+          <h4>{{ settings.trust_item_4_title }}</h4>
+          <p>{{ settings.trust_item_4_desc }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. SHOP BY CATEGORY -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <p class="section-tag">ক্যাটাগরি সমূহ</p>
+        <h2 class="section-title">পছন্দের পণ্য বেছে নিন</h2>
+      </div>
+      <a href="{{ url_for('products') }}" class="btn btn-outline btn-sm">সকল পণ্য দেখুন ➔</a>
+    </div>
+
+    <div class="category-grid">
+      {% for cat in categories %}
+      <a href="{{ url_for('products', category=cat.slug) }}" class="category-card">
+        <div class="category-image-wrap">
+          <img src="{{ cat.image_url or '/static/images/logo.png' }}" alt="{{ cat.name_bn }}" loading="lazy">
+        </div>
+        <div class="category-content">
+          <h3 class="category-name">{{ cat.name_bn }}</h3>
+          <p class="category-desc">{{ cat.description|truncate(65) }}</p>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- 4. BEST SELLERS / POPULAR PRODUCTS -->
+<section class="section" style="background-color: var(--pd-ivory);">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <p class="section-tag">জনপ্রিয় খাদ্যপণ্য</p>
+        <h2 class="section-title">সেরা বিক্রিত পণ্যসম্ভার</h2>
+      </div>
+      <a href="{{ url_for('products') }}" class="btn btn-outline btn-sm">সব পণ্য দেখুন ➔</a>
+    </div>
+
+    <div class="product-grid">
+      {% for p in featured_products %}
+      <article class="product-card">
+        <!-- Wishlist Button -->
+        <button class="wishlist-toggle-btn" data-product-id="{{ p.id }}" style="position: absolute; top: 12px; right: 12px; z-index: 5; background: #fff; border: 1px solid var(--pd-border); border-radius: 50%; width: 34px; height: 34px; display: grid; place-items: center; cursor: pointer;" title="পছন্দের তালিকায় রাখুন">
+          ♥
+        </button>
+
+        <!-- Product Image -->
+        <a href="{{ url_for('product_detail', slug=p.slug) }}" class="product-card-top">
+          {% if p.discount_price and p.discount_price < p.regular_price %}
+            {% set pct = ((p.regular_price - p.discount_price) / p.regular_price * 100)|round|int %}
+            <span class="product-badge-discount">-{{ pct }}% ছাড়</span>
+          {% endif %}
+          <img src="{{ p.main_image or '/static/images/logo.png' }}" alt="{{ p.name_bn }}" loading="lazy">
+        </a>
+
+        <!-- Product Info -->
+        <div class="product-card-body">
+          <span class="product-category-sub">{{ p.category_name }}</span>
+          <h3 class="product-title">
+            <a href="{{ url_for('product_detail', slug=p.slug) }}">{{ p.name_bn }}</a>
+          </h3>
+          <div class="product-unit">প্যাক সাইজ: <b>{{ p.unit }}</b></div>
+          
+          <div class="product-rating">
+            <span>★★★★★</span>
+            <span class="count">({{ p.rating_count }} রিভিউ)</span>
+          </div>
+
+          <div class="product-card-footer">
+            <div class="price-box">
+              <span class="current-price">৳{{ (p.discount_price or p.regular_price)|int }}</span>
+              {% if p.discount_price and p.discount_price < p.regular_price %}
+                <span class="regular-price">৳{{ p.regular_price|int }}</span>
+              {% endif %}
+            </div>
+
+            <button class="btn-add-cart" onclick="addToCart({{ p.id }}, 1)">
+              + কার্টে যোগ করুন
+            </button>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- 5. PROMOTIONAL COMBO BANNER -->
+<section class="section" style="padding-top: 30px; padding-bottom: 30px;">
+  <div class="container">
+    <div style="background: linear-gradient(135deg, var(--pd-forest), #164d36); border-radius: var(--pd-radius-lg); padding: 48px; color: #fff; display: grid; grid-template-columns: 1.2fr 0.8fr; align-items: center; gap: 40px; box-shadow: var(--pd-shadow-lg);">
+      <div>
+        <span style="background: var(--pd-gold); color: var(--pd-forest-dark); font-weight: 800; font-size: 0.8rem; padding: 4px 12px; border-radius: 20px; text-transform: uppercase;">বিশেষ পারিবারিক প্যাকেজ</span>
+        <h2 style="font-size: 2.2rem; font-weight: 800; color: #fff; margin: 14px 0 12px; line-height: 1.25;">Pure Drop পারিবারিক স্বাস্থ্য কম্বো প্যাক</h2>
+        <p style="font-size: 1.05rem; color: #d1e3d8; line-height: 1.6; margin-bottom: 24px;">দেশি খাঁটি গাওয়া ঘি ৫০০ গ্রাম + সুন্দরবনের প্রাকৃতিক মধু ৫০০ গ্রাম + ঘানি ভাঙা সরিষার তেল ১ লিটার। এক সাথে নিলে সাশ্রয় পুরো ৩৩০ টাকা!</p>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <a href="/product/family-wellness-combo" class="btn btn-secondary btn-lg">অর্ডার করুন (৳২,৫৯০) ➔</a>
+          <span style="font-size: 0.9rem; color: #9fccb3;">* ঢাকার মধ্যে ফ্রি হোম ডেলিভারি</span>
+        </div>
+      </div>
+      <div style="text-align: center;">
+        <img src="/static/images/poster_natural.png" style="max-height: 320px; margin: 0 auto; border-radius: 12px; border: 4px solid rgba(255,255,255,0.2); box-shadow: 0 12px 30px rgba(0,0,0,0.3);" alt="কম্বো অফার">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. BRAND STORY / EDITORIAL -->
+<section class="editorial-section">
+  <div class="container editorial-grid">
+    <div class="editorial-img-wrap">
+      <img src="{{ settings.story_image }}" alt="Pure Drop গল্প" loading="lazy">
+    </div>
+    <div class="editorial-content">
+      <p class="section-tag">আমাদের অঙ্গীকার</p>
+      <h2>{{ settings.story_title }}</h2>
+      <p>{{ settings.story_content }}</p>
+      <div style="display: flex; gap: 24px; margin-bottom: 24px;">
+        <div>
+          <strong style="display: block; font-size: 1.6rem; color: var(--pd-forest); font-family: 'DM Sans';">১০০%</strong>
+          <small style="color: var(--pd-text-muted);">প্রাকৃতিক উপাদান</small>
+        </div>
+        <div>
+          <strong style="display: block; font-size: 1.6rem; color: var(--pd-forest); font-family: 'DM Sans';">০%</strong>
+          <small style="color: var(--pd-text-muted);">কেমিক্যাল ও প্রিজারভেটিভ</small>
+        </div>
+        <div>
+          <strong style="display: block; font-size: 1.6rem; color: var(--pd-forest); font-family: 'DM Sans';">২৪/৭</strong>
+          <small style="color: var(--pd-text-muted);">গ্রাহক সন্তুষ্টি</small>
+        </div>
+      </div>
+      <a href="{{ url_for('about') }}" class="btn btn-outline">আমাদের বিস্তারিত গল্প ➔</a>
+    </div>
+  </div>
+</section>
+
+<!-- 7. BLOG & RECIPES PREVIEW -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <p class="section-tag">পুষ্টি ও রেসিপি</p>
+        <h2 class="section-title">স্বাস্থ্য সচেতন টিপস ও রান্নার রেসিপি</h2>
+      </div>
+      <a href="{{ url_for('blog') }}" class="btn btn-outline btn-sm">সকল লেখা পড়ুন ➔</a>
+    </div>
+
+    <div class="blog-grid">
+      {% for post in blog_posts %}
+      <article class="blog-card">
+        <a href="{{ url_for('blog_detail', slug=post.slug) }}" class="blog-card-img">
+          <img src="{{ post.cover_image or '/static/images/poster_natural.png' }}" alt="{{ post.title }}" loading="lazy">
+        </a>
+        <div class="blog-card-body">
+          <span class="blog-category">{{ post.category }}</span>
+          <h3 class="blog-title">
+            <a href="{{ url_for('blog_detail', slug=post.slug) }}">{{ post.title }}</a>
+          </h3>
+          <p class="blog-excerpt">{{ post.excerpt|truncate(110) }}</p>
+          <div class="blog-author">✍️ {{ post.author_name }}</div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- 8. NEWSLETTER SUBSCRIPTION -->
+<section class="container">
+  <div class="newsletter-strip">
+    <div class="container newsletter-inner">
+      <div class="newsletter-text">
+        <h3>📩 আমাদের নিয়মিত আপডেট ও বিশেষ অফার পেতে যুক্ত থাকুন</h3>
+        <p>সপ্তাহে নতুন স্টক ও পুষ্টি টিপস আপনার ইমেইলে পৌঁছে দেব। কোনো স্প্যাম নেই।</p>
+      </div>
+      <form class="newsletter-form" action="{{ url_for('newsletter_subscribe') }}" method="POST">
+        <input type="email" name="email" placeholder="আপনার ইমেইল অ্যাড্রেস লিখুন..." required>
+        <button type="submit">সাবস্ক্রাইব</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

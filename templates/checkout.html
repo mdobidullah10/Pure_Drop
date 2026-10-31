@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block title %}অর্ডার চেকআউট — Pure Drop{% endblock %}
+
+{% block content %}
+<div class="container">
+  
+  <div class="checkout-grid">
+    
+    <!-- Left Column: Delivery & Payment Details -->
+    <div>
+      <h1 style="font-size: 2rem; font-weight: 800; color: var(--pd-forest); margin-bottom: 8px;">
+        অর্ডার কনফার্মেশন
+      </h1>
+      <p style="color: var(--pd-text-muted); margin-bottom: 24px;">
+        ডেলিভারি তথ্য দিন এবং আপনার সুবিধাজনক পেমেন্ট পদ্ধতি বেছে নিন।
+      </p>
+
+      <form action="{{ url_for('checkout_submit') }}" method="POST" id="checkoutForm">
+        <input type="hidden" name="delivery_fee" id="deliveryFeeInput" value="{{ delivery_fee }}">
+        <input type="hidden" id="checkoutSubtotalVal" value="{{ subtotal }}">
+        <input type="hidden" id="checkoutDiscountVal" value="{{ discount }}">
+
+        <!-- 1. Customer Information Card -->
+        <div class="checkout-card" style="margin-bottom: 24px;">
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--pd-forest); margin-bottom: 18px; display: flex; align-items: center; gap: 8px;">
+            <span>📍</span> <span>ডেলিভারি ঠিকানা ও তথ্য</span>
+          </h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>আপনার সম্পূর্ণ নাম *</label>
+              <input type="text" name="customer_name" class="form-control" required placeholder="নাম লিখুন" value="{{ user.name if user else '' }}">
+            </div>
+            <div class="form-group">
+              <label>সচল মোবাইল নম্বর * (১১ ডিজিট)</label>
+              <input type="tel" name="phone" class="form-control" required pattern="^01[3-9]\d{8}$" placeholder="017XXXXXXXX" value="{{ user.phone if user else '' }}">
+              <small style="font-size: 0.75rem; color: var(--pd-text-light);">ডেলিভারি সংক্রান্ত যোগাযোগের জন্য এই নম্বর ব্যবহৃত হবে</small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>জেলা নির্বাচন করুন *</label>
+              <select name="district" id="checkoutDistrict" class="form-control" required>
+                <option value="Dhaka" selected>ঢাকা (Dhaka)</option>
+                <option value="Chittagong">চট্টগ্রাম (Chattogram)</option>
+                <option value="Sylhet">সিলেট (Sylhet)</option>
+                <option value="Rajshahi">রাজশাহী (Rajshahi)</option>
+                <option value="Khulna">খুলনা (Khulna)</option>
+                <option value="Barisal">বরিশাল (Barishal)</option>
+                <option value="Rangpur">রংপুর (Rangpur)</option>
+                <option value="Mymensingh">ময়মনসিংহ (Mymensingh)</option>
+                <option value="Gazipur">গাজীপুর (Gazipur)</option>
+                <option value="Narayanganj">নারায়ণগঞ্জ (Narayanganj)</option>
+                <option value="Comilla">কুমিল্লা (Cumilla)</option>
+                <option value="Bogra">বগুড়া (Bogura)</option>
+                <option value="Noakhali">নোয়াখালী (Noakhali)</option>
+                <option value="Feni">ফেনী (Feni)</option>
+                <option value="CoxsBazar">কক্সবাজার (Cox's Bazar)</option>
+                <option value="Brahmanbaria">ব্রাহ্মণবাড়িয়া (Brahmanbaria)</option>
+                <option value="Tangail">টাঙ্গাইল (Tangail)</option>
+                <option value="Jessore">যশোর (Jashore)</option>
+                <option value="Kushtia">কুষ্টিয়া (Kushtia)</option>
+                <option value="Pabna">পাবনা (Pabna)</option>
+                <option value="Dinajpur">দিনাজপুর (Dinajpur)</option>
+                <option value="Faridpur">ফরিদপুর (Faridpur)</option>
+                <option value="Other">অন্যান্য জেলা (Other District)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>থানা / এলাকা *</label>
+              <input type="text" name="thana_area" class="form-control" required placeholder="যেমন: ধানমন্ডি, উত্তরা, চকবাজার">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>পূর্ণাঙ্গ ঠিকানা (বাসা নং, রোড নং, ইত্যাদি) *</label>
+            <textarea name="full_address" class="form-control" rows="2" required placeholder="বাসা নম্বর, রোড নম্বর বা গ্রামের বিস্তারিত ঠিকানা লিখুন..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>ইমেইল অ্যাড্রেস (ঐচ্ছিক)</label>
+              <input type="email" name="email" class="form-control" placeholder="example@gmail.com" value="{{ user.email if user else '' }}">
+            </div>
+            <div class="form-group">
+              <label>বিশেষ নির্দেশনা (ঐচ্ছিক)</label>
+              <input type="text" name="order_notes" class="form-control" placeholder="যেমন: ডেলিভারির আগে কল করবেন">
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 2. Payment Method Card -->
+        <div class="checkout-card">
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--pd-forest); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+            <span>💳</span> <span>পেমেন্ট পদ্ধতি নির্বাচন করুন</span>
+          </h3>
+
+          <div class="payment-methods-grid">
+            
+            <!-- Cash on Delivery -->
+            <label class="payment-option-card active" data-method="COD">
+              <input type="radio" name="payment_method" value="Cash on Delivery" checked style="display: none;">
+              <div style="font-size: 1.6rem; margin-bottom: 6px;">💵</div>
+              <strong style="display: block; font-size: 0.95rem; color: var(--pd-forest);">ক্যাশ অন ডেলিভারি</strong>
+              <small style="color: var(--pd-text-muted);">পণ্য পেয়ে টাকা পরিশোধ</small>
+            </label>
+
+            <!-- bKash -->
+            {% if settings.bkash_enabled == '1' %}
+            <label class="payment-option-card" data-method="bKash">
+              <input type="radio" name="payment_method" value="bKash" style="display: none;">
+              <div style="font-size: 1.6rem; margin-bottom: 6px;">📱</div>
+              <strong style="display: block; font-size: 0.95rem; color: #d12053;">বিকাশ (bKash)</strong>
+              <small style="color: var(--pd-text-muted);">ম্যানুয়াল পেমেন্ট / TrxID</small>
+            </label>
+            {% endif %}
+
+            <!-- Nagad -->
+            {% if settings.nagad_enabled == '1' %}
+            <label class="payment-option-card" data-method="Nagad">
+              <input type="radio" name="payment_method" value="Nagad" style="display: none;">
+              <div style="font-size: 1.6rem; margin-bottom: 6px;">📲</div>
+              <strong style="display: block; font-size: 0.95rem; color: #f26522;">নগদ (Nagad)</strong>
+              <small style="color: var(--pd-text-muted);">ম্যানুয়াল পেমেন্ট / TrxID</small>
+            </label>
+            {% endif %}
+
+          </div>
+
+          <!-- bKash Details Box (Shown conditionally) -->
+          <div id="bkashPaymentDetails" style="display: none; background: #fdf2f4; border: 1.5px solid #f9ccd6; border-radius: var(--pd-radius-md); padding: 20px; margin-top: 18px;">
+            <h4 style="color: #d12053; font-size: 1rem; font-weight: 700; margin-bottom: 8px;">বিকাশ পেমেন্ট নির্দেশনা:</h4>
+            <p style="font-size: 0.88rem; color: #6d1b2e; line-height: 1.6; margin-bottom: 12px;">{{ settings.bkash_instructions }}</p>
+            <div style="background: #fff; padding: 10px 14px; border-radius: 6px; font-weight: 700; color: #d12053; margin-bottom: 14px;">
+              বিকাশ নম্বর: <b>{{ settings.bkash_number }}</b> ({{ settings.bkash_type }})
+            </div>
+            <div class="form-row">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label style="color: #6d1b2e;">প্রেরকের বিকাশ নম্বর:</label>
+                <input type="text" name="payment_sender_phone" class="form-control" placeholder="01XXXXXXXXX">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label style="color: #6d1b2e;">ট্রানজেকশন আইডি (TrxID) *:</label>
+                <input type="text" name="payment_trx_id" class="form-control" placeholder="যেমন: BK9284X7">
+              </div>
+            </div>
+          </div>
+
+          <!-- Nagad Details Box (Shown conditionally) -->
+          <div id="nagadPaymentDetails" style="display: none; background: #fff6f0; border: 1.5px solid #fed7c3; border-radius: var(--pd-radius-md); padding: 20px; margin-top: 18px;">
+            <h4 style="color: #f26522; font-size: 1rem; font-weight: 700; margin-bottom: 8px;">নগদ পেমেন্ট নির্দেশনা:</h4>
+            <p style="font-size: 0.88rem; color: #7c2d12; line-height: 1.6; margin-bottom: 12px;">{{ settings.nagad_instructions }}</p>
+            <div style="background: #fff; padding: 10px 14px; border-radius: 6px; font-weight: 700; color: #f26522; margin-bottom: 14px;">
+              নগদ নম্বর: <b>{{ settings.nagad_number }}</b> ({{ settings.nagad_type }})
+            </div>
+            <div class="form-row">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label style="color: #7c2d12;">প্রেরকের নগদ নম্বর:</label>
+                <input type="text" name="payment_sender_phone_nagad" class="form-control" placeholder="01XXXXXXXXX">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label style="color: #7c2d12;">ট্রানজেকশন আইডি (TrxID) *:</label>
+                <input type="text" name="payment_trx_id_nagad" class="form-control" placeholder="যেমন: 7DX94821">
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 24px;">
+          ✓ অর্ডার নিশ্চিত করুন ➔
+        </button>
+
+      </form>
+    </div>
+
+    <!-- Right Column: Order Summary -->
+    <div>
+      <div class="checkout-card" style="position: sticky; top: 100px;">
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--pd-forest); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--pd-border);">
+          অর্ডার পণ্যের বিবরণ ({{ items|length }})
+        </h3>
+
+        <!-- Items list -->
+        <div style="display: flex; flex-direction: column; gap: 14px; max-height: 320px; overflow-y: auto; margin-bottom: 20px; padding-right: 6px;">
+          {% for item in items %}
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+              <img src="{{ item.product.main_image or '/static/images/logo.png' }}" style="width: 50px; height: 50px; border-radius: var(--pd-radius-sm); object-fit: cover;">
+              <div style="flex: 1;">
+                <h5 style="font-size: 0.92rem; font-weight: 700; color: var(--pd-forest); margin-bottom: 2px;">{{ item.product.name_bn }}</h5>
+                <small style="color: var(--pd-text-muted);">{{ item.quantity }} × ৳{{ item.unit_price|int }}</small>
+              </div>
+              <strong style="font-size: 0.95rem; color: var(--pd-forest); font-family: 'DM Sans', sans-serif;">
+                ৳{{ item.line_total|int }}
+              </strong>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Calculations -->
+        <div style="border-top: 1px solid var(--pd-border); padding-top: 16px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem;">
+            <span style="color: var(--pd-text-muted);">সাবটোটাল:</span>
+            <strong>৳{{ subtotal|int }}</strong>
+          </div>
+
+          {% if discount > 0 %}
+          <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem; color: #166534;">
+            <span>কুপন ছাড় ({{ coupon_code }}):</span>
+            <strong>-৳{{ discount|int }}</strong>
+          </div>
+          {% endif %}
+
+          <div style="display: flex; justify-content: space-between; margin-bottom: 14px; font-size: 0.95rem;">
+            <span style="color: var(--pd-text-muted);">ডেলিভারি চার্জ:</span>
+            <strong id="checkoutDeliveryFee">৳{{ delivery_fee|int }}</strong>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; padding-top: 14px; border-top: 1.5px dashed var(--pd-border); margin-bottom: 18px;">
+            <span style="font-size: 1.15rem; font-weight: 800; color: var(--pd-forest);">সর্বমোট প্রদেয়:</span>
+            <strong id="checkoutGrandTotal" style="font-size: 1.45rem; font-weight: 800; color: var(--pd-forest); font-family: 'DM Sans', sans-serif;">
+              ৳{{ total|int }}
+            </strong>
+          </div>
+
+          <div style="background: var(--pd-ivory); border-radius: var(--pd-radius-sm); padding: 12px; font-size: 0.8rem; color: var(--pd-text-muted); line-height: 1.5;">
+            🌿 <b>নিশ্চিত বিশুদ্ধতা:</b> আমাদের প্রতিটি পণ্য নিজস্ব তদারকিতে প্রস্তুত ও প্যাকেজিংকৃত। ডেলিভারির সময় পণ্য দেখে বুঝে নিন।
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

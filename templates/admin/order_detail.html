@@ -1,0 +1,200 @@
+{% extends "admin/layout.html" %}
+
+{% block page_title %}অর্ডার বিবরণ: {{ order.order_number }}{% endblock %}
+
+{% block content %}
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+  <div>
+    <span style="font-size: 0.9rem; color: var(--admin-text-muted);">অর্ডার তৈরির তারিখ: {{ order.created_at }}</span>
+  </div>
+  <div style="display: flex; gap: 10px;">
+    <button onclick="window.print()" class="btn-admin btn-admin-secondary">
+      🖨️ ইনভয়েস প্রিন্ট
+    </button>
+    <a href="{{ url_for('admin_orders') }}" class="btn-admin btn-admin-secondary">
+      ← সকল অর্ডারে ফিরুন
+    </a>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1.4fr 0.8fr; gap: 32px; align-items: start;">
+  
+  <!-- Left Column: Items & Customer Details -->
+  <div>
+    
+    <!-- Items Card -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">অর্ডারের পণ্যসমূহ (Ordered Items)</h3>
+      </div>
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>পণ্য</th>
+              <th>ভ্যারিয়েন্ট</th>
+              <th>একক দাম</th>
+              <th>পরিমাণ</th>
+              <th style="text-align: right;">মোট মূল্য</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+            <tr>
+              <td>
+                <strong>{{ item.product_name }}</strong>
+              </td>
+              <td>{{ item.variant_title or '-' }}</td>
+              <td>৳{{ item.unit_price|int }}</td>
+              <td>{{ item.quantity }} টি</td>
+              <td style="text-align: right; font-weight: 700; font-family: 'DM Sans';">
+                ৳{{ item.line_total|int }}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4" style="text-align: right; color: var(--admin-text-muted);">সাবটোটাল (Subtotal):</td>
+              <td style="text-align: right; font-weight: 700;">৳{{ order.subtotal|int }}</td>
+            </tr>
+            {% if order.discount_amount > 0 %}
+            <tr>
+              <td colspan="4" style="text-align: right; color: #166534;">কুপন ছাড় ({{ order.coupon_code }}):</td>
+              <td style="text-align: right; color: #166534; font-weight: 700;">-৳{{ order.discount_amount|int }}</td>
+            </tr>
+            {% endif %}
+            <tr>
+              <td colspan="4" style="text-align: right; color: var(--admin-text-muted);">ডেলিভারি চার্জ:</td>
+              <td style="text-align: right; font-weight: 700;">৳{{ order.delivery_fee|int }}</td>
+            </tr>
+            <tr style="font-size: 1.15rem; font-weight: 800; background: #f8fafc; border-top: 1.5px solid var(--admin-border);">
+              <td colspan="4" style="text-align: right; color: var(--admin-primary);">সর্বমোট প্রদেয়:</td>
+              <td style="text-align: right; color: var(--admin-primary); font-family: 'DM Sans';">৳{{ order.total|int }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- Customer & Delivery Card -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">গ্রাহক ও ডেলিভারির তথ্য</h3>
+      </div>
+      <div class="card-body">
+        <div class="form-grid-2">
+          <div>
+            <label style="color: var(--admin-text-muted); font-size: 0.82rem; text-transform: uppercase;">গ্রাহকের নাম:</label>
+            <p style="font-size: 1.05rem; font-weight: 700;">{{ order.customer_name }}</p>
+          </div>
+          <div>
+            <label style="color: var(--admin-text-muted); font-size: 0.82rem; text-transform: uppercase;">মোবাইল নম্বর:</label>
+            <p style="font-size: 1.05rem; font-weight: 700;">
+              <a href="tel:{{ order.phone }}" style="color: var(--admin-primary); text-decoration: underline;">{{ order.phone }}</a>
+              <a href="https://wa.me/88{{ order.phone|replace('-', '')|replace(' ', '') }}" target="_blank" style="margin-left: 8px; font-size: 0.85rem; color: #128c7e;">(WhatsApp)</a>
+            </p>
+          </div>
+          <div>
+            <label style="color: var(--admin-text-muted); font-size: 0.82rem; text-transform: uppercase;">জেলা ও থানা:</label>
+            <p style="font-weight: 600;">{{ order.district }} ({{ order.thana_area }})</p>
+          </div>
+          <div>
+            <label style="color: var(--admin-text-muted); font-size: 0.82rem; text-transform: uppercase;">ইমেইল:</label>
+            <p>{{ order.email or 'N/A' }}</p>
+          </div>
+        </div>
+
+        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--admin-border);">
+          <label style="color: var(--admin-text-muted); font-size: 0.82rem; text-transform: uppercase;">পূর্ণাঙ্গ ডেলিভারি ঠিকানা:</label>
+          <p style="font-weight: 600; font-size: 1rem; margin-top: 4px;">{{ order.full_address }}</p>
+        </div>
+
+        {% if order.order_notes %}
+        <div style="margin-top: 16px; background: #fefce8; border: 1px solid #fef08a; padding: 12px; border-radius: 6px;">
+          <strong style="color: #854d0e; font-size: 0.88rem;">গ্রাহকের বিশেষ নির্দেশনা:</strong>
+          <p style="color: #713f12; margin-top: 2px;">{{ order.order_notes }}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right Column: Status & Courier Updates -->
+  <div>
+    
+    <!-- Order & Payment Management Form -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">অর্ডার প্রসেসিং কন্ট্রোল</h3>
+      </div>
+      <div class="card-body">
+        <form action="{{ url_for('admin_order_detail', order_id=order.id) }}" method="POST">
+          
+          <!-- Order Status -->
+          <div class="admin-form-group">
+            <label>ডেলিভারি স্ট্যাটাস (Order Status) *</label>
+            <select name="status" class="admin-select" required>
+              <option value="Pending" {% if order.status == 'Pending' %}selected{% endif %}>⏳ Pending (অপেক্ষমাণ)</option>
+              <option value="Confirmed" {% if order.status == 'Confirmed' %}selected{% endif %}>📞 Confirmed (কনফার্মড)</option>
+              <option value="Processing" {% if order.status == 'Processing' %}selected{% endif %}>📦 Processing (প্যাকিং হচ্ছে)</option>
+              <option value="Shipped" {% if order.status == 'Shipped' %}selected{% endif %}>🚚 Shipped (কুরিয়ারে হস্তান্তর)</option>
+              <option value="Delivered" {% if order.status == 'Delivered' %}selected{% endif %}>✓ Delivered (ডেলিভারি সম্পন্ন)</option>
+              <option value="Cancelled" {% if order.status == 'Cancelled' %}selected{% endif %}>❌ Cancelled (বাতিল)</option>
+              <option value="Returned" {% if order.status == 'Returned' %}selected{% endif %}>↩️ Returned (ফেরত)</option>
+            </select>
+          </div>
+
+          <!-- Payment Status -->
+          <div class="admin-form-group">
+            <label>পেমেন্ট স্ট্যাটাস (Payment Status) *</label>
+            <select name="payment_status" class="admin-select" required>
+              <option value="Unpaid" {% if order.payment_status == 'Unpaid' %}selected{% endif %}>Unpaid (পরিশোধ বাকি)</option>
+              <option value="Pending Verification" {% if order.payment_status == 'Pending Verification' %}selected{% endif %}>Pending Verification</option>
+              <option value="Paid" {% if order.payment_status == 'Paid' %}selected{% endif %}>Paid (পরিশোধিত)</option>
+              <option value="Refunded" {% if order.payment_status == 'Refunded' %}selected{% endif %}>Refunded (টাকা ফেরত)</option>
+            </select>
+          </div>
+
+          <div class="admin-form-group">
+            <label>পেমেন্ট ট্রানজেকশন আইডি (TrxID)</label>
+            <input type="text" name="payment_trx_id" class="admin-input" value="{{ order.payment_trx_id or '' }}" placeholder="bKash / Nagad TrxID">
+          </div>
+
+          <!-- Courier Details -->
+          <div class="admin-form-group">
+            <label>কুরিয়ার সার্ভিস পার্টনার</label>
+            <select name="courier_name" class="admin-select">
+              <option value="">কুরিয়ার নির্বাচন করুন</option>
+              <option value="Steadfast Courier" {% if order.courier_name == 'Steadfast Courier' %}selected{% endif %}>Steadfast Courier</option>
+              <option value="Pathao Courier" {% if order.courier_name == 'Pathao Courier' %}selected{% endif %}>Pathao Courier</option>
+              <option value="RedX" {% if order.courier_name == 'RedX' %}selected{% endif %}>RedX Delivery</option>
+              <option value="Sundarban Courier" {% if order.courier_name == 'Sundarban Courier' %}selected{% endif %}>Sundarban Courier</option>
+              <option value="Own Delivery" {% if order.courier_name == 'Own Delivery' %}selected{% endif %}>Pure Drop নিজস্ব রাইডার</option>
+            </select>
+          </div>
+
+          <div class="admin-form-group">
+            <label>কুরিয়ার কনসাইনমেন্ট / ট্র্যাকিং নম্বর</label>
+            <input type="text" name="tracking_code" class="admin-input" value="{{ order.tracking_code or '' }}" placeholder="যেমন: SF-984210">
+          </div>
+
+          <div class="admin-form-group">
+            <label>অ্যাডমিন অভ্যন্তরীণ নোট (Internal Notes)</label>
+            <textarea name="admin_notes" class="admin-textarea" rows="3" placeholder="কাস্টমারের সাথে কথা হয়েছে, বিশেষ ডেলিভারি নোট ইত্যাদি...">{{ order.admin_notes or '' }}</textarea>
+          </div>
+
+          <button type="submit" class="btn-admin btn-admin-primary" style="width: 100%; justify-content: center; padding: 12px;">
+            ✓ আপডেট সংরক্ষণ করুন
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}

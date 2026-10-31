@@ -1,0 +1,156 @@
+{% extends "admin/layout.html" %}
+
+{% block page_title %}হোমপেজ ও কনটেন্ট কাস্টমাইজার (Homepage CMS){% endblock %}
+
+{% block content %}
+
+<div style="max-width: 920px;">
+  
+  <form action="{{ url_for('admin_cms_homepage') }}" method="POST">
+    
+    <!-- 1. Top Announcement Bar -->
+    <div class="card">
+      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 class="card-title">১. শীর্ষ ঘোষণা ও নোটিশ বার (Announcement Bar)</h3>
+        <label class="checkbox-label">
+          <input type="checkbox" name="announcement_enabled" value="1" {% if settings.announcement_enabled == '1' %}checked{% endif %}>
+          <strong>ঘোষণা বার সক্রিয় রাখুন</strong>
+        </label>
+      </div>
+      <div class="card-body">
+        <div class="admin-form-group">
+          <label>ঘোষণার লেখা (Announcement Text)</label>
+          <input type="text" name="announcement_text" class="admin-input" value="{{ settings.announcement_text }}">
+        </div>
+        <div class="admin-form-group">
+          <label>লিংক (Action Link)</label>
+          <input type="text" name="announcement_link" class="admin-input" value="{{ settings.announcement_link }}" placeholder="/products">
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Signature Hero Section -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">২. সিগনেচার হিরো ব্যানার (Hero Section)</h3>
+      </div>
+      <div class="card-body">
+        
+        <div class="admin-form-group">
+          <label>হিরো ব্যাজ টেক্সট (Badge)</label>
+          <input type="text" name="hero_badge" class="admin-input" value="{{ settings.hero_badge }}">
+        </div>
+
+        <div class="admin-form-group">
+          <label>মূল শিরোনাম (Hero Headline) *</label>
+          <input type="text" name="hero_headline" class="admin-input" required value="{{ settings.hero_headline }}">
+        </div>
+
+        <div class="admin-form-group">
+          <label>সহযোগী বিবরণ (Hero Subtitle)</label>
+          <textarea name="hero_subtitle" class="admin-textarea" rows="3">{{ settings.hero_subtitle }}</textarea>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="admin-form-group">
+            <label>প্রধান বাটন টেক্সট (Primary CTA)</label>
+            <input type="text" name="hero_primary_btn_text" class="admin-input" value="{{ settings.hero_primary_btn_text }}">
+          </div>
+          <div class="admin-form-group">
+            <label>প্রধান বাটন লিংক (URL)</label>
+            <input type="text" name="hero_primary_btn_link" class="admin-input" value="{{ settings.hero_primary_btn_link }}">
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="admin-form-group">
+            <label>দ্বিতীয় বাটন টেক্সট (Secondary CTA)</label>
+            <input type="text" name="hero_secondary_btn_text" class="admin-input" value="{{ settings.hero_secondary_btn_text }}">
+          </div>
+          <div class="admin-form-group">
+            <label>দ্বিতীয় বাটন লিংক (URL)</label>
+            <input type="text" name="hero_secondary_btn_link" class="admin-input" value="{{ settings.hero_secondary_btn_link }}">
+          </div>
+        </div>
+
+        <div class="admin-form-group">
+          <label>হিরো ছবির ইউআরএল (Hero Image)</label>
+          <input type="text" name="hero_image" class="admin-input image-url-preview-input" data-preview-target="heroPreview" value="{{ settings.hero_image }}">
+          <div style="margin-top: 10px;">
+            <img id="heroPreview" src="{{ settings.hero_image }}" style="max-height: 180px; border-radius: 8px; border: 1px solid var(--admin-border);">
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 3. Trust & Service Highlights -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">৩. আস্থা ও সেবার বৈশিষ্ট্য (Trust Highlights)</h3>
+      </div>
+      <div class="card-body">
+        
+        <div class="form-grid-2">
+          <div class="admin-form-group">
+            <label>হাইলাইট ১ শিরোনাম</label>
+            <input type="text" name="trust_item_1_title" class="admin-input" value="{{ settings.trust_item_1_title }}">
+            <input type="text" name="trust_item_1_desc" class="admin-input" style="margin-top: 6px;" value="{{ settings.trust_item_1_desc }}">
+          </div>
+          <div class="admin-form-group">
+            <label>হাইলাইট ২ শিরোনাম</label>
+            <input type="text" name="trust_item_2_title" class="admin-input" value="{{ settings.trust_item_2_title }}">
+            <input type="text" name="trust_item_2_desc" class="admin-input" style="margin-top: 6px;" value="{{ settings.trust_item_2_desc }}">
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="admin-form-group">
+            <label>হাইলাইট ৩ শিরোনাম</label>
+            <input type="text" name="trust_item_3_title" class="admin-input" value="{{ settings.trust_item_3_title }}">
+            <input type="text" name="trust_item_3_desc" class="admin-input" style="margin-top: 6px;" value="{{ settings.trust_item_3_desc }}">
+          </div>
+          <div class="admin-form-group">
+            <label>হাইলাইট ৪ শিরোনাম</label>
+            <input type="text" name="trust_item_4_title" class="admin-input" value="{{ settings.trust_item_4_title }}">
+            <input type="text" name="trust_item_4_desc" class="admin-input" style="margin-top: 6px;" value="{{ settings.trust_item_4_desc }}">
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 4. Brand Story Section -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">৪. ব্র্যান্ড প্রতিশ্রুতি ও গল্প (Brand Story)</h3>
+      </div>
+      <div class="card-body">
+        
+        <div class="admin-form-group">
+          <label>গল্পের শিরোনাম</label>
+          <input type="text" name="story_title" class="admin-input" value="{{ settings.story_title }}">
+        </div>
+
+        <div class="admin-form-group">
+          <label>গল্পের বিষয়বস্তু</label>
+          <textarea name="story_content" class="admin-textarea" rows="4">{{ settings.story_content }}</textarea>
+        </div>
+
+        <div class="admin-form-group">
+          <label>ছবির ইউআরএল</label>
+          <input type="text" name="story_image" class="admin-input" value="{{ settings.story_image }}">
+        </div>
+
+      </div>
+    </div>
+
+    <button type="submit" class="btn-admin btn-admin-primary" style="padding: 12px 32px; font-size: 1rem;">
+      ✓ হোমপেজ পরিবর্তন সংরক্ষণ করুন
+    </button>
+
+  </form>
+
+</div>
+
+{% endblock %}

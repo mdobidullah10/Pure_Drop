@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}আমার প্রোফাইল ও অর্ডার হিস্ট্রি — Pure Drop{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 0 80px;">
+  
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; border-bottom: 1px solid var(--pd-border); padding-bottom: 20px;">
+    <div>
+      <h1 style="font-size: 2rem; font-weight: 800; color: var(--pd-forest); margin-bottom: 4px;">
+        স্বাগতম, {{ user.name }}!
+      </h1>
+      <p style="color: var(--pd-text-muted); font-size: 0.92rem;">মোবাইল: {{ user.phone }} | ইমেইল: {{ user.email or 'সংযুক্ত নেই' }}</p>
+    </div>
+    <div>
+      <form action="{{ url_for('customer_logout') }}" method="POST">
+        <button type="submit" class="btn btn-outline btn-sm" style="color: #ef4444; border-color: #ef4444;">
+          লগআউট ➔
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 40px;">
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--pd-forest); margin-bottom: 16px;">
+      📦 আমার সাম্প্রতিক অর্ডারসমূহ ({{ orders|length }})
+    </h3>
+
+    {% if orders %}
+      <div style="background: #fff; border: 1px solid var(--pd-border); border-radius: var(--pd-radius-lg); overflow: hidden; box-shadow: var(--pd-shadow-sm);">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem;">
+          <thead>
+            <tr style="background: var(--pd-ivory); border-bottom: 1px solid var(--pd-border);">
+              <th style="padding: 14px 18px;">অর্ডার নম্বর</th>
+              <th style="padding: 14px 18px;">তারিখ</th>
+              <th style="padding: 14px 18px;">মোট মূল্য</th>
+              <th style="padding: 14px 18px;">পেমেন্ট</th>
+              <th style="padding: 14px 18px;">স্ট্যাটাস</th>
+              <th style="padding: 14px 18px; text-align: right;">অ্যাকশন</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for o in orders %}
+            <tr style="border-bottom: 1px solid var(--pd-border);">
+              <td style="padding: 14px 18px; font-weight: 700; color: var(--pd-forest); font-family: 'DM Sans', sans-serif;">
+                {{ o.order_number }}
+              </td>
+              <td style="padding: 14px 18px; color: var(--pd-text-muted);">
+                {{ o.created_at[:10] }}
+              </td>
+              <td style="padding: 14px 18px; font-weight: 700; font-family: 'DM Sans', sans-serif;">
+                ৳{{ o.total|int }}
+              </td>
+              <td style="padding: 14px 18px;">
+                <span class="badge-status badge-{{ o.payment_status|lower }}">{{ o.payment_method }}</span>
+              </td>
+              <td style="padding: 14px 18px;">
+                <span class="badge-status badge-{{ o.status|lower }}">{{ o.status }}</span>
+              </td>
+              <td style="padding: 14px 18px; text-align: right;">
+                <a href="{{ url_for('track', order_number=o.order_number, phone=o.phone) }}" class="btn btn-outline btn-sm">
+                  ট্র্যাক করুন ➔
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="background: #fff; border: 1px solid var(--pd-border); border-radius: var(--pd-radius-lg); padding: 48px; text-align: center;">
+        <div style="font-size: 3rem; margin-bottom: 12px;">📦</div>
+        <h4 style="color: var(--pd-forest); font-size: 1.2rem; margin-bottom: 6px;">এখনও কোনো অর্ডার করেননি</h4>
+        <p style="color: var(--pd-text-muted); margin-bottom: 18px;">আপনার পছন্দের খাঁটি খাবার এখনই অর্ডার করুন।</p>
+        <a href="{{ url_for('products') }}" class="btn btn-primary">কেনাকাটা শুরু করুন ➔</a>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

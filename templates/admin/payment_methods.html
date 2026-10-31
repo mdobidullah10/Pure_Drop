@@ -1,0 +1,97 @@
+{% extends "admin/layout.html" %}
+
+{% block page_title %}পেমেন্ট মেথড সেটিংস (Payment Methods Configuration){% endblock %}
+
+{% block content %}
+
+<div style="max-width: 840px;">
+  
+  <form action="{{ url_for('admin_payment_methods') }}" method="POST">
+    
+    <!-- 1. Cash on Delivery (COD) -->
+    <div class="card">
+      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 class="card-title">১. ক্যাশ অন ডেলিভারি (Cash on Delivery)</h3>
+        <label class="checkbox-label">
+          <input type="checkbox" name="cod_enabled" value="1" {% if settings.cod_enabled == '1' %}checked{% endif %}>
+          <strong>সক্রিয় রাখুন</strong>
+        </label>
+      </div>
+      <div class="card-body">
+        <p style="color: var(--admin-text-muted); font-size: 0.92rem;">
+          গ্রাহক পণ্য হাতে পেয়ে ডেলিভারিম্যানকে নগদ অর্থ পরিশোধ করবেন।
+        </p>
+      </div>
+    </div>
+
+    <!-- 2. bKash Settings -->
+    <div class="card">
+      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 class="card-title" style="color: #d12053;">২. বিকাশ পেমেন্ট (bKash Configuration)</h3>
+        <label class="checkbox-label">
+          <input type="checkbox" name="bkash_enabled" value="1" {% if settings.bkash_enabled == '1' %}checked{% endif %}>
+          <strong>বিকাশ সক্রিয় রাখুন</strong>
+        </label>
+      </div>
+      <div class="card-body">
+        <div class="form-grid-2">
+          <div class="admin-form-group">
+            <label>বিকাশ একাউন্ট নম্বর *</label>
+            <input type="text" name="bkash_number" class="admin-input" value="{{ settings.bkash_number }}" placeholder="017XXXXXXXX">
+          </div>
+          <div class="admin-form-group">
+            <label>একাউন্ট ধরন (Type)</label>
+            <select name="bkash_type" class="admin-select">
+              <option value="Merchant" {% if settings.bkash_type == 'Merchant' %}selected{% endif %}>Merchant (মার্চেন্ট - Make Payment)</option>
+              <option value="Personal" {% if settings.bkash_type == 'Personal' %}selected{% endif %}>Personal (ব্যক্তিগত - Send Money)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="admin-form-group">
+          <label>গ্রাহকের জন্য পেমেন্ট নির্দেশনা (Instructions)</label>
+          <textarea name="bkash_instructions" class="admin-textarea" rows="3">{{ settings.bkash_instructions }}</textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Nagad Settings -->
+    <div class="card">
+      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 class="card-title" style="color: #f26522;">৩. নগদ পেমেন্ট (Nagad Configuration)</h3>
+        <label class="checkbox-label">
+          <input type="checkbox" name="nagad_enabled" value="1" {% if settings.nagad_enabled == '1' %}checked{% endif %}>
+          <strong>নগদ সক্রিয় রাখুন</strong>
+        </label>
+      </div>
+      <div class="card-body">
+        <div class="form-grid-2">
+          <div class="admin-form-group">
+            <label>নগদ একাউন্ট নম্বর *</label>
+            <input type="text" name="nagad_number" class="admin-input" value="{{ settings.nagad_number }}" placeholder="017XXXXXXXX">
+          </div>
+          <div class="admin-form-group">
+            <label>একাউন্ট ধরন (Type)</label>
+            <select name="nagad_type" class="admin-select">
+              <option value="Merchant" {% if settings.nagad_type == 'Merchant' %}selected{% endif %}>Merchant (মার্চেন্ট)</option>
+              <option value="Personal" {% if settings.nagad_type == 'Personal' %}selected{% endif %}>Personal (ব্যক্তিগত)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="admin-form-group">
+          <label>গ্রাহকের জন্য পেমেন্ট নির্দেশনা (Instructions)</label>
+          <textarea name="nagad_instructions" class="admin-textarea" rows="3">{{ settings.nagad_instructions }}</textarea>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-admin btn-admin-primary" style="padding: 12px 32px; font-size: 1rem;">
+      ✓ পেমেন্ট সেটিংস সংরক্ষণ করুন
+    </button>
+
+  </form>
+
+</div>
+
+{% endblock %}

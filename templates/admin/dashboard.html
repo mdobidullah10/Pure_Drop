@@ -1,0 +1,181 @@
+{% extends "admin/layout.html" %}
+
+{% block page_title %}ড্যাশবোর্ড ওভারভিউ (Overview){% endblock %}
+
+{% block content %}
+
+<!-- Key Metrics Grid -->
+<div class="metrics-grid">
+  
+  <!-- Total Revenue -->
+  <div class="metric-card">
+    <div class="metric-icon-wrap green">৳</div>
+    <div class="metric-details">
+      <small>মোট বিক্রয় (Total Revenue)</small>
+      <strong>৳{{ stats.total_sales|int }}</strong>
+    </div>
+  </div>
+
+  <!-- Total Orders -->
+  <div class="metric-card">
+    <div class="metric-icon-wrap blue">📦</div>
+    <div class="metric-details">
+      <small>মোট অর্ডার (Orders)</small>
+      <strong>{{ stats.total_orders }} টি</strong>
+    </div>
+  </div>
+
+  <!-- Pending Orders -->
+  <div class="metric-card">
+    <div class="metric-icon-wrap gold">⏳</div>
+    <div class="metric-details">
+      <small>অপেক্ষমাণ অর্ডার (Pending)</small>
+      <strong>{{ stats.pending_orders }} টি</strong>
+    </div>
+  </div>
+
+  <!-- Low Stock Warning -->
+  <div class="metric-card">
+    <div class="metric-icon-wrap red">⚠️</div>
+    <div class="metric-details">
+      <small>স্বল্প মজুদের পণ্য (Low Stock)</small>
+      <strong>{{ stats.low_stock_count }} টি</strong>
+    </div>
+  </div>
+
+</div>
+
+<!-- Quick Action Shortcuts -->
+<div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+  <a href="{{ url_for('admin_product_new') }}" class="btn-admin btn-admin-primary">
+    + নতুন পণ্য যোগ করুন
+  </a>
+  <a href="{{ url_for('admin_orders', status='Pending') }}" class="btn-admin btn-admin-secondary">
+    ⏳ পেন্ডিং অর্ডার দেখুন ({{ stats.pending_orders }})
+  </a>
+  <a href="{{ url_for('admin_inventory') }}" class="btn-admin btn-admin-secondary">
+    📦 স্টক আপডেট করুন
+  </a>
+  <a href="{{ url_for('admin_cms_homepage') }}" class="btn-admin btn-admin-secondary">
+    🎨 হোমপেজ ব্যানার এডিট
+  </a>
+  <a href="{{ url_for('admin_export_orders') }}" class="btn-admin btn-admin-secondary">
+    📥 অর্ডার ডাটা এক্সপোর্ট (CSV)
+  </a>
+</div>
+
+<!-- Recent Orders Table -->
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">সাম্প্রতিক অর্ডারসমূহ (Recent Orders)</h3>
+    <a href="{{ url_for('admin_orders') }}" class="btn-admin btn-admin-sm btn-admin-secondary">
+      সকল অর্ডার দেখুন ➔
+    </a>
+  </div>
+  
+  <div class="table-responsive">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>অর্ডার নম্বর</th>
+          <th>গ্রাহক</th>
+          <th>তারিখ</th>
+          <th>মোট টাকা</th>
+          <th>পেমেন্ট মেথড</th>
+          <th>পেমেন্ট স্ট্যাটাস</th>
+          <th>ডেলিভারি অবস্থা</th>
+          <th style="text-align: right;">অ্যাকশন</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for o in recent_orders %}
+        <tr>
+          <td>
+            <a href="{{ url_for('admin_order_detail', order_id=o.id) }}" style="font-weight: 700; color: var(--admin-primary); font-family: 'DM Sans', sans-serif;">
+              {{ o.order_number }}
+            </a>
+          </td>
+          <td>
+            <strong>{{ o.customer_name }}</strong>
+            <small style="display: block; color: var(--admin-text-muted);">{{ o.phone }}</small>
+          </td>
+          <td>{{ o.created_at[:10] }}</td>
+          <td>
+            <strong style="font-family: 'DM Sans', sans-serif; color: var(--admin-primary);">
+              ৳{{ o.total|int }}
+            </strong>
+          </td>
+          <td>{{ o.payment_method }}</td>
+          <td>
+            <span class="badge-status badge-{{ o.payment_status|lower }}">
+              {{ o.payment_status }}
+            </span>
+          </td>
+          <td>
+            <span class="badge-status badge-{{ o.status|lower }}">
+              {{ o.status }}
+            </span>
+          </td>
+          <td style="text-align: right;">
+            <a href="{{ url_for('admin_order_detail', order_id=o.id) }}" class="btn-admin btn-admin-sm btn-admin-primary">
+              বিস্তারিত ➔
+            </a>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="8" style="text-align: center; padding: 32px; color: var(--admin-text-muted);">
+            কোনো সাম্প্রতিক অর্ডার নেই।
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Low Stock Alert Box -->
+{% if low_stock_products %}
+<div class="card" style="border-left: 4px solid var(--admin-warning);">
+  <div class="card-header">
+    <h3 class="card-title" style="color: #b45309;">⚠️ জরুরি স্টক সতর্কতা (Low Stock Alert)</h3>
+    <a href="{{ url_for('admin_inventory') }}" class="btn-admin btn-admin-sm btn-admin-secondary">ইনভেন্টরি দেখুন</a>
+  </div>
+  <div class="table-responsive">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>পণ্য</th>
+          <th>ক্যাটাগরি</th>
+          <th>বর্তমান স্টক</th>
+          <th>সতর্কতা সীমা</th>
+          <th>একক মূল্য</th>
+          <th style="text-align: right;">অ্যাকশন</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in low_stock_products %}
+        <tr>
+          <td>
+            <strong>{{ p.name_bn }}</strong>
+            <small style="display: block; color: var(--admin-text-muted);">SKU: {{ p.sku }}</small>
+          </td>
+          <td>{{ p.category_name }}</td>
+          <td>
+            <span style="color: #ef4444; font-weight: 800; font-size: 1.1rem;" id="stockVal_{{ p.id }}">{{ p.stock }}</span> {{ p.unit }}
+          </td>
+          <td>{{ p.low_stock_threshold }}</td>
+          <td>৳{{ (p.discount_price or p.regular_price)|int }}</td>
+          <td style="text-align: right;">
+            <button onclick="adjustStock({{ p.id }}, 10)" class="btn-admin btn-admin-sm btn-admin-secondary">+১০ স্টক যোগ করুন</button>
+            <a href="{{ url_for('admin_product_edit', product_id=p.id) }}" class="btn-admin btn-admin-sm btn-admin-primary">এডিট</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

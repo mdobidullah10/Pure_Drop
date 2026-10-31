@@ -1,0 +1,97 @@
+{% extends "admin/layout.html" %}
+
+{% block page_title %}ক্যাটাগরি ব্যবস্থাপনা (Categories){% endblock %}
+
+{% block content %}
+
+<div style="display: grid; grid-template-columns: 1fr 1.6fr; gap: 32px; align-items: start;">
+  
+  <!-- Add New Category Card -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">+ নতুন ক্যাটাগরি যোগ করুন</h3>
+    </div>
+    <div class="card-body">
+      <form action="{{ url_for('admin_category_add') }}" method="POST">
+        <div class="admin-form-group">
+          <label>ক্যাটাগরির নাম (বাংলায়) *</label>
+          <input type="text" name="name_bn" class="admin-input" required placeholder="যেমন: খাঁটি ঘি">
+        </div>
+
+        <div class="admin-form-group">
+          <label>ক্যাটাগরির নাম (English) *</label>
+          <input type="text" name="name_en" class="admin-input" required placeholder="e.g. Pure Ghee">
+        </div>
+
+        <div class="admin-form-group">
+          <label>ইউআরএল স্লাগ (Slug) *</label>
+          <input type="text" name="slug" class="admin-input" required placeholder="ghee">
+        </div>
+
+        <div class="admin-form-group">
+          <label>ছবির লিংক (Image URL)</label>
+          <input type="text" name="image_url" class="admin-input" placeholder="/static/images/... বা https://...">
+        </div>
+
+        <div class="admin-form-group">
+          <label>সংক্ষিপ্ত বিবরণ (Description)</label>
+          <textarea name="description" class="admin-textarea" rows="3" placeholder="ক্যাটাগরির পরিচিতি..."></textarea>
+        </div>
+
+        <div class="admin-form-group">
+          <label>সর্টিং ক্রম (Sort Order)</label>
+          <input type="number" name="sort_order" class="admin-input" value="1" min="0">
+        </div>
+
+        <button type="submit" class="btn-admin btn-admin-primary" style="width: 100%; justify-content: center;">
+          ✓ ক্যাটাগরি সংরক্ষণ করুন
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Category List -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">বিদ্যমান ক্যাটাগরিসমূহ ({{ categories|length }})</h3>
+    </div>
+    <div class="table-responsive">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ছবি</th>
+            <th>নাম ও স্লাগ</th>
+            <th>পণ্য সংখ্যা</th>
+            <th>সর্ট অর্ডার</th>
+            <th style="text-align: right;">অ্যাকশন</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cat in categories %}
+          <tr>
+            <td style="width: 50px;">
+              <img src="{{ cat.image_url or '/static/images/logo.png' }}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 6px; border: 1px solid var(--admin-border);">
+            </td>
+            <td>
+              <strong>{{ cat.name_bn }}</strong>
+              <small style="display: block; color: var(--admin-text-muted);">{{ cat.name_en }} ({{ cat.slug }})</small>
+            </td>
+            <td>
+              <span class="badge-status badge-confirmed">{{ cat.product_count }} টি পণ্য</span>
+            </td>
+            <td>{{ cat.sort_order }}</td>
+            <td style="text-align: right;">
+              <form action="{{ url_for('admin_category_delete', category_id=cat.id) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('আপনি কি এই ক্যাটাগরি মুছে ফেলতে চান?');">
+                <button type="submit" class="btn-admin btn-admin-sm btn-admin-danger">🗑️ মুছুন</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
